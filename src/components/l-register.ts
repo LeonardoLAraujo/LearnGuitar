@@ -16,7 +16,7 @@ export default class LRegister extends LitElement{
             .register{
                 width: 300px;
                 background-color: var(--dark-blue);
-                padding: 2rem;
+                padding: 1rem;
                 border-top-right-radius: 30px;
                 border-bottom-left-radius: 30px;
                 color: #fff;

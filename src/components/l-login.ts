@@ -17,7 +17,7 @@ export default class LLogin extends LitElement{
             .login{
                 width: 300px;
                 background-color: var(--dark-blue);
-                padding: 2rem;
+                padding: 1rem;
                 border-top-left-radius: 30px;
                 border-bottom-right-radius: 30px;
                 color: #fff;
