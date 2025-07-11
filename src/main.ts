@@ -1,16 +1,22 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
 import { customElement } from 'lit/decorators.js';
+import "./client/l-enter-account";
 
 @customElement('l-main')
 export default class LMain extends LitElement{
 
     static override get styles(): CSSResult{
-        return css``;
+        return css`
+            :host{
+                width: 100%;
+                height: 100%;
+            }
+        `;
     }
 
     protected override render(): TemplateResult{
         return html`
-            <h1>NDD</h1>
+            <l-enter-account></l-enter-account>
         `;
     }
 
