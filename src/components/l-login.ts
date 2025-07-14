@@ -1,7 +1,9 @@
-import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import {LitElement, html, css, TemplateResult, CSSResult, PropertyValues} from 'lit';
+import { customElement, query, state } from 'lit/decorators.js';
 import LOGO from "../images/logo.png";
 import "./l-register";
+import "./l-forget-password";
+import LForgetPassword from './l-forget-password';
 
 @customElement('l-login')
 export default class LLogin extends LitElement{
@@ -38,6 +40,8 @@ export default class LLogin extends LitElement{
             .form a{
                 color: #fff;
                 margin-top: 0.3rem;
+                cursor: pointer;
+                text-decoration: underline;
             }
 
             .form a:hover{
@@ -87,14 +91,34 @@ export default class LLogin extends LitElement{
     }
 
     @state()
-    isRegister: boolean = false;
+    private _isRegister: boolean = false;
+
+    @query(".login")
+    private _containerLogin!: HTMLDivElement;
+
+    @query("l-forget-password")
+    lForgetPassword!: LForgetPassword;
+
+    protected override firstUpdated(_changedProperties: PropertyValues): void {
+        this.lForgetPassword.hiddenForget();
+    }
 
     private goToRegisterAccount(): void{
-        this.isRegister = true;
+        this._isRegister = true;
     }
 
     private goToLoginAccount(): void{
-        this.isRegister = false;
+        this._isRegister = false;
+    }
+
+    private forgetPassword(): void{
+        this._containerLogin.style.display = "none";
+        this.lForgetPassword.style.display = "flex";
+    }
+
+    private sendPassword(): void{
+        this.lForgetPassword.style.display = "none";
+        this._containerLogin.style.display = "flex";
     }
 
     private generateLogin(): TemplateResult {
@@ -110,7 +134,7 @@ export default class LLogin extends LitElement{
                 <form class="form">
                     <input type="email" placeholder="E-mail" required>
                     <input type="password" placeholder="Senha" required>
-                    <a href="#">Esqueci a Senha</a>
+                    <a @click=${this.forgetPassword}>Esqueci a Senha</a>
                     <button type="submit" class="form__button">Entrar</button>
                 </form>
 
@@ -125,7 +149,8 @@ export default class LLogin extends LitElement{
 
     protected override render(): TemplateResult{
         return html`
-            ${this.isRegister ? this.generateRegister() : this.generateLogin()}
+            <l-forget-password .sendPassword=${() => {this.sendPassword()}}></l-forget-password>
+            ${this._isRegister ? this.generateRegister() : this.generateLogin()}
         `;
     }
 

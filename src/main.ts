@@ -1,6 +1,8 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
 import { customElement } from 'lit/decorators.js';
 import "./client/l-enter-account";
+import "./client/l-home";
+import "./client/l-menu";
 
 @customElement('l-main')
 export default class LMain extends LitElement{
@@ -16,7 +18,8 @@ export default class LMain extends LitElement{
 
     protected override render(): TemplateResult{
         return html`
-            <l-enter-account></l-enter-account>
+            <l-menu></l-menu>
+            <l-home></l-home>
         `;
     }
 

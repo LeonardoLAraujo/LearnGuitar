@@ -6,16 +6,17 @@
     box-sizing: border-box;
     width: 100vw;
     height: 100vh;
+    scroll-behavior: smooth;
 }
 
 *::-webkit-scrollbar{
-    background-color: #003B57;
+    background-color: #D9D9D9;
     color: #fff;
     width: 13px;
 }
 
 *::-webkit-scrollbar-thumb{
-    background-color: #fff;
+    background-color: var(--light-blue);
     border-radius: 0px;
 }
 
