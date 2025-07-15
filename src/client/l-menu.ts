@@ -13,7 +13,7 @@ export default class LMenu extends LitElement{
                 flex-direction: column;
                 position: fixed;
                 width: 100%;
-                z-index: 2;
+                z-index: 4;
             }
 
             .menu,
@@ -106,6 +106,7 @@ export default class LMenu extends LitElement{
             }
 
             .menu__enterAccount{
+                display: none;
                 color: #fff;
                 cursor: pointer;
             }
@@ -123,16 +124,24 @@ export default class LMenu extends LitElement{
                 .animation{
                     display: none;
                 }
+
+                .menu__enterAccount{
+                    display: block;
+                }
             }
 
         `;
     }
 
     @state()
-    isOpenMenu: boolean = false;
+    private _isOpenMenu: boolean = false;
 
     @query(".animation__links")
     private _containerAnimationLinks!: HTMLDivElement;
+
+    private goToPage(source: string): void{
+        window.location.href = source;
+    }
 
     private generateLinkMenu(text: string, onPressed?: Function){
         return html`<li>
@@ -141,9 +150,9 @@ export default class LMenu extends LitElement{
     }
 
     private openMenu(): void{
-        this.isOpenMenu = !this.isOpenMenu;
+        this._isOpenMenu = !this._isOpenMenu;
 
-        if(this.isOpenMenu){
+        if(this._isOpenMenu){
             this._containerAnimationLinks.style.animation = "openMenuMobileAnimation 700ms cubic-bezier(0, 0, 0.04, 1) forwards";
         }else{
             this._containerAnimationLinks.style.animation = "closeMenuMobileAnimation 700ms cubic-bezier(0, 0, 0.04, 1) forwards";
@@ -159,20 +168,20 @@ export default class LMenu extends LitElement{
                         <ecv-icon .icon=${IconTypes.Menu} .iconStyle=${{color: "#fff", size: "40px"}}></ecv-icon>
                     </div>
                     <ul class="menu__links">
-                        ${this.generateLinkMenu("Home", () => {})}
-                        ${this.generateLinkMenu("Aulas", () => {})}
-                        ${this.generateLinkMenu("Postagens", () => {})}
-                        ${this.generateLinkMenu("Vídeos", () => {})}
+                        ${this.generateLinkMenu("Home", () => {this.goToPage("/")})}
+                        ${this.generateLinkMenu("Aulas", () => {this.goToPage("/aulas")})}
+                        ${this.generateLinkMenu("Postagens", () => {this.goToPage("/postagens")})}
+                        ${this.generateLinkMenu("Vídeos", () => {this.goToPage("/videos")})}
                     </ul>
-                    <p class="menu__enterAccount">Entrar</p>
+                    <p class="menu__enterAccount" @click=${() => {this.goToPage("/entrar")}}>Entrar</p>
                 </nav>
 
                 <div class="animation">
                     <ul class="animation__links">
-                        ${this.generateLinkMenu("Home", () => {this.openMenu()})}
-                        ${this.generateLinkMenu("Aulas", () => {this.openMenu()})}
-                        ${this.generateLinkMenu("Postagens", () => {this.openMenu()})}
-                        ${this.generateLinkMenu("Vídeos", () => {this.openMenu()})}
+                        ${this.generateLinkMenu("Home", () => {this.goToPage("/"); this.openMenu()})}
+                        ${this.generateLinkMenu("Aulas", () => {this.goToPage("/aulas"); this.openMenu()})}
+                        ${this.generateLinkMenu("Postagens", () => {this.goToPage("/postagens"); this.openMenu()})}
+                        ${this.generateLinkMenu("Vídeos", () => {this.goToPage("/videos"); this.openMenu()})}
                     </ul>
                 </div>
             </div>

@@ -3,6 +3,8 @@ import { customElement } from 'lit/decorators.js';
 import "./client/l-enter-account";
 import "./client/l-home";
 import "./client/l-menu";
+import "./client/l-classes";
+import { Router } from '@lit-labs/router';
 
 @customElement('l-main')
 export default class LMain extends LitElement{
@@ -16,10 +18,18 @@ export default class LMain extends LitElement{
         `;
     }
 
+    private router  = new Router(this, [
+        {path: '/',             render: () => html`<l-home></l-home>`},
+        {path: '/aulas',        render: () => html`<l-classes></l-classes>`},
+        {path: '/postagens',    render: () => html`<h1>About</h1>`},
+        {path: '/videos',       render: () => html`<h1>About</h1>`},
+        {path: '/entrar',       render: () => html`<l-enter-account></l-enter-account>`},
+    ]);
+
     protected override render(): TemplateResult{
         return html`
             <l-menu></l-menu>
-            <l-home></l-home>
+            ${this.router.outlet()}
         `;
     }
 
