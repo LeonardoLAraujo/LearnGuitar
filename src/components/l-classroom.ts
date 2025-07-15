@@ -75,7 +75,6 @@ export default class LClassroom extends LitElement{
                 gap: 20px;
                 width: 70%;
                 height: auto;
-                overflow: auto;
                 padding-bottom: 10px;
             }
 
