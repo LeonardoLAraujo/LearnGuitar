@@ -4,6 +4,8 @@ import LOGO from "../images/logo.png";
 import "./l-register";
 import "./l-forget-password";
 import LForgetPassword from './l-forget-password';
+import { Service } from '../server/service';
+import { ObjectUser, User } from '../model/user';
 
 @customElement('l-login')
 export default class LLogin extends LitElement{
@@ -97,10 +99,16 @@ export default class LLogin extends LitElement{
     private _containerLogin!: HTMLDivElement;
 
     @query("l-forget-password")
-    lForgetPassword!: LForgetPassword;
+    private _lForgetPassword!: LForgetPassword;
+
+    @query(".form__email")
+    private _inputEmailUser!: HTMLInputElement;
+
+    @query(".form__password")
+    private _inputPassword!: HTMLInputElement;
 
     protected override firstUpdated(_changedProperties: PropertyValues): void {
-        this.lForgetPassword.hiddenForget();
+        this._lForgetPassword.hiddenForget();
     }
 
     private goToRegisterAccount(): void{
@@ -113,12 +121,31 @@ export default class LLogin extends LitElement{
 
     private forgetPassword(): void{
         this._containerLogin.style.display = "none";
-        this.lForgetPassword.style.display = "flex";
+        this._lForgetPassword.style.display = "flex";
     }
 
     private sendPassword(): void{
-        this.lForgetPassword.style.display = "none";
+        this._lForgetPassword.style.display = "none";
         this._containerLogin.style.display = "flex";
+    }
+
+    private async logIn(e: MouseEvent){
+        e.preventDefault();
+
+        if(this._inputEmailUser.value == "" || this._inputPassword.value == ""){
+            return;
+        }
+
+        const service: Service = new Service;
+
+        service.loginUser(this._inputEmailUser.value, this._inputPassword.value).then((response: ObjectUser) => {
+            const user: User = new User(response);
+
+            localStorage.setItem("user", JSON.stringify({user}));
+
+            window.location.href = "/";
+        });
+
     }
 
     private generateLogin(): TemplateResult {
@@ -132,10 +159,10 @@ export default class LLogin extends LitElement{
             <div class="login">
                 <div class="login__logo"></div>
                 <form class="form">
-                    <input type="email" placeholder="E-mail" required>
-                    <input type="password" placeholder="Senha" required>
+                    <input type="email" class="form__email"  placeholder="E-mail" required>
+                    <input class="form__password" type="password" placeholder="Senha" required>
                     <a @click=${this.forgetPassword}>Esqueci a Senha</a>
-                    <button type="submit" class="form__button">Entrar</button>
+                    <button type="submit" class="form__button" @click=${(e: MouseEvent) => {this.logIn(e)}}>Entrar</button>
                 </form>
 
                 <button class="login__button" @click=${this.goToRegisterAccount}>Registrar-se</button>

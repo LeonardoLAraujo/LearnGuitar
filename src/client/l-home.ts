@@ -3,8 +3,9 @@ import { customElement, query } from 'lit/decorators.js';
 import TEACHER from "../images/teacher.png";
 import { IconTypes } from 'ecv-component';
 
+
 @customElement('l-home')
-export default class LHome extends LitElement{
+export default class LHome extends LitElement{ 
 
     static override get styles(): CSSResult{
         return css`

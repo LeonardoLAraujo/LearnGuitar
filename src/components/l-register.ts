@@ -1,6 +1,7 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, property } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import LOGO from "../images/logo.png";
+import { Service } from '../server/service';
 
 @customElement('l-register')
 export default class LRegister extends LitElement{
@@ -92,11 +93,57 @@ export default class LRegister extends LitElement{
             .register__button:hover{
                 background-color: var(--light-blue);
             }
+
+            .form__errorCreateAccount,
+            .form__successCreateAccount{
+                display: none;
+                margin: 0;
+                font-family: PoppinsBold;
+                text-align: center;
+                font-size: 18px;
+            }
+
         `;
     }
 
+    @state()
+    private _erroUsername: string = "";
+
+    @query(".form__errorCreateAccount")
+    private _containerErroCreateAccount!: HTMLParagraphElement;
+
+    @query(".form__username")
+    private _inputUsername!: HTMLInputElement;
+
+    @query(".form__email")
+    private _inputEmail!: HTMLInputElement;
+
+    @query(".form__password")
+    private _inputPassword!: HTMLInputElement;
+
     @property({attribute: false})
     onPressed: Function = () => {};
+
+    private async createAccount(e: MouseEvent): Promise<void> {
+        e.preventDefault();
+
+        if(this._inputUsername.value == "" || this._inputEmail.value == "" || this._inputPassword.value == ""){
+            return;
+        }
+
+        const service: Service = new Service;
+        
+        service.createAccount(this._inputUsername.value, this._inputEmail.value, this._inputPassword.value).then((result: any) => {
+            if(!result.success){
+                this._erroUsername = result.registerMessage;
+                this._containerErroCreateAccount.style.display = "block";
+            }else{
+                this._containerErroCreateAccount.style.display = "block";
+                this._erroUsername = result.registerMessage;  
+            }
+        });
+        
+    }
 
     protected override render(): TemplateResult{
         return html`
@@ -109,16 +156,17 @@ export default class LRegister extends LitElement{
             <div class="register">
                 <div class="register__logo"></div>
                 <form class="form">
-                    <input type="text" placeholder="Usuário" required>
-                    <input type="email" placeholder="E-mail" required>
-                    <input type="password" placeholder="Senha" required>
+                    <input type="text" class="form__username" placeholder="Username" required>
+                    <input type="email" class="form__email" placeholder="E-mail" required>
+                    <input type="password" class="form__password" placeholder="Senha" required>
                     <div class="form__terms">
                         <input type="checkbox" required>
-                        <label>Aceito os Termos</label>
+                        <label>Aceito os <a href="#">Termos</a></label>
                     </div>
-                    <button type="submit" class="form__button">Registrar</button>
+                    <p class="form__errorCreateAccount">${this._erroUsername}</p>
+                    <button type="submit" class="form__button" @click=${(e: MouseEvent) => {this.createAccount(e)}}>Registrar</button>
                 </form>
-
+         
                 <button class="register__button" @click=${this.onPressed}>Entrar</button>
             </div>
         `;
