@@ -27,7 +27,7 @@ export default class LCardClassroom extends LitElement{
                 padding: 0;
             }
 
-            @media (min-width: 1024px){
+            @media (min-width: 1200PX){
                 .card{
                     width: 200px;
                     height: 40px;

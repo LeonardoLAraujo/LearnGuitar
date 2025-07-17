@@ -1,18 +1,18 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, state } from 'lit/decorators.js';
-import "./client/l-enter-account";
+import { customElement, query } from 'lit/decorators.js';
 import "./client/l-home";
 import "./client/l-menu";
 import "./client/l-classes";
 import "./client/l-post";
 import "./client/l-video";
+import "./components/l-login";
+import "./client/l-profile-user";
 import { Router } from '@lit-labs/router';
-import { ISocket } from './interfaces/isocket';
-import { DefaultEventsMap } from 'socket.io';
-import { io, Socket } from 'socket.io-client';
+import LMenu from './client/l-menu';
 
-@customElement('l-main')
-export default class LMain extends LitElement implements ISocket{
+
+@customElement('learn-guitar')
+export default class LearnGuitar extends LitElement{
 
     static override get styles(): CSSResult{
         return css`
@@ -23,26 +23,35 @@ export default class LMain extends LitElement implements ISocket{
         `;
     }
 
-    private router  = new Router(this, [
+    @query("l-menu")
+    lMenu!: LMenu;
+    
+    public router  = new Router(this, [
         {path: '/',             render: () => html`<l-home></l-home>`},
         {path: '/aulas',        render: () => html`<l-classes></l-classes>`},
         {path: '/postagens',    render: () => html`<l-post></l-post>`},
         {path: '/videos',       render: () => html`<l-video></l-video>`},
-        {path: '/entrar',       render: () => html`<l-enter-account></l-enter-account>`},
+        {path: '/entrar',       render: () => html`<l-login .referenceLearnGuitar=${this}></l-login>`},
+        {path: '/profile',      render: () => html`<l-profile-user></l-profile-user>`}
     ]);
 
-    @state()
-    socket!: Socket<DefaultEventsMap, DefaultEventsMap>;
-    
     override connectedCallback(): void {
         super.connectedCallback();
+    }
 
-        this.socket = io();
+    protected override firstUpdated(): void {
+        if(JSON.parse(localStorage.getItem("user") as string) != null){
+            this.lMenu.isLogged = true;
+        }
+    }
+
+    public goToPage(source: string){
+        this.router.goto(source);
     }
 
     protected override render(): TemplateResult{
         return html`
-            <l-menu></l-menu>
+            <l-menu .referenceLearnGuitar=${this}></l-menu>
             ${this.router.outlet()}
         `;
     }
@@ -51,6 +60,6 @@ export default class LMain extends LitElement implements ISocket{
 
 declare global{
    interface HTMLElementTagNameMap{
-    'l-main': LMain
+    'learn-guitar': LearnGuitar
    }
 }

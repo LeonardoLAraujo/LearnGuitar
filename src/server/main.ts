@@ -51,7 +51,7 @@ export class Setting {
 				}, (error: MysqlError, result: any) => {
 
 					if(error != null){
-						this.mysqlInstance.getConnection().rollback();
+						throw error;
 					}
 
 					if(result){
@@ -76,7 +76,6 @@ export class Setting {
 				}, (error: MysqlError, result: any) => {
 
 					if(error != null){
-						this.mysqlInstance.getConnection().rollback();
 						throw error;
 					}
 		
@@ -104,7 +103,6 @@ export class Setting {
 							values: [req.body.name, req.body.email, req.body.password]
 						}, (error: MysqlError, response) => {
 							if(error != null){
-								this.mysqlInstance.getConnection().rollback();
 								throw error;
 							}
 
@@ -112,6 +110,60 @@ export class Setting {
 								return resp.json({ success: false, registerMessage: 'Usuário Cadastrado com Sucesso!'});
 							}
 						});
+					}
+				});
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
+
+		this.app.post("/createPost", (req: any, resp: any) => {
+			try{
+				const insertPost = "INSERT INTO post(user_id, text) VALUES(?, ?)";
+
+				this.mysqlInstance.getConnection().query({
+					sql: insertPost,
+					values: [req.body.userId, req.body.text]
+				}, (error: MysqlError, result: any) => {
+					if(error != null){
+						throw error;
+					}
+
+					if(result){
+						return resp.json({sucess: true, message: "Postado com Sucesso!"})
+					}
+				});
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
+
+		this.app.post("/allPost", (_req: any, resp: any) => {
+			try{
+				this.mysqlInstance.getConnection().query(`SELECT IFNULL (
+															(
+																SELECT JSON_ARRAYAGG(
+																	JSON_OBJECT(
+																		'id', p.id,
+																		'text', p.text,
+																		'userId', u.id,
+																		'username', u.username,
+																		'photoUser', u.photo,
+																		'date', p.date
+																	)
+																)
+																FROM post p
+																JOIN USER u ON p.user_id = u.id
+															),
+															JSON_ARRAY()
+														) AS POSTS`, 
+				(error: MysqlError, result: any) => {
+					if(error != null){
+						throw error;
+					}
+
+					if(result){
+						return resp.json(result[0].POSTS);
 					}
 				});
 			}catch(error){
@@ -126,6 +178,10 @@ export class Setting {
 
 			socket.on('disconnect', () => {
 				console.log(`user => ${socket.id} was disconnected`);
+			});
+
+			socket.on("logIn", () => {
+				this.io.emit('logou', "logou");
 			});
 		});
 	}
@@ -147,7 +203,6 @@ const app = new Setting(mysqlInstance);
 app.listenServer();
 
 mysqlInstance.createConnection();
-mysqlInstance.connect();
 
 
 

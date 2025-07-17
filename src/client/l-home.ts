@@ -177,7 +177,7 @@ export default class LHome extends LitElement{
                     height: 100px;
                     position: absolute;
                     right: 0;
-                    top: 0;
+                    top: -1px;
                     clip-path: polygon(50% 100%, 0 0, 100% 0);
                     background-color: #D9D9D9;
                 }

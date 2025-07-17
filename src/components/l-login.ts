@@ -1,17 +1,26 @@
 import {LitElement, html, css, TemplateResult, CSSResult, PropertyValues} from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import LOGO from "../images/logo.png";
 import "./l-register";
 import "./l-forget-password";
 import LForgetPassword from './l-forget-password';
 import { Service } from '../server/service';
 import { ObjectUser, User } from '../model/user';
+import LearnGuitar from '../learn-guitar';
 
 @customElement('l-login')
 export default class LLogin extends LitElement{
 
     static override get styles(): CSSResult{
         return css`
+            .l-enter{
+                width: 100%;
+                height: 100%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
             .login,
             .form{
                 display: flex;
@@ -107,6 +116,9 @@ export default class LLogin extends LitElement{
     @query(".form__password")
     private _inputPassword!: HTMLInputElement;
 
+    @property({attribute: false})
+    referenceLearnGuitar!: LearnGuitar;
+
     protected override firstUpdated(_changedProperties: PropertyValues): void {
         this._lForgetPassword.hiddenForget();
     }
@@ -142,8 +154,8 @@ export default class LLogin extends LitElement{
             const user: User = new User(response);
 
             localStorage.setItem("user", JSON.stringify({user}));
-
-            window.location.href = "/";
+            this.referenceLearnGuitar.lMenu.isLogged = true;
+            this.referenceLearnGuitar.goToPage("/");
         });
 
     }
@@ -176,8 +188,10 @@ export default class LLogin extends LitElement{
 
     protected override render(): TemplateResult{
         return html`
-            <l-forget-password .sendPassword=${() => {this.sendPassword()}}></l-forget-password>
-            ${this._isRegister ? this.generateRegister() : this.generateLogin()}
+            <div class="l-enter">
+                <l-forget-password .sendPassword=${() => {this.sendPassword()}}></l-forget-password>
+                ${this._isRegister ? this.generateRegister() : this.generateLogin()}
+            </div>
         `;
     }
 

@@ -1,6 +1,9 @@
 import { IconTypes } from 'ecv-component';
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
+import { Post } from '../model/post';
+
+const IMAGE_DEFAULT = "https://upload.wikimedia.org/wikipedia/commons/0/03/Sem_imagem.jpg";
 
 @customElement('l-card-post')
 export default class LCardPost extends LitElement{
@@ -88,8 +91,16 @@ export default class LCardPost extends LitElement{
             }
 
             @media (min-width: 1024px){
+                .cardPost{
+                    width: 700px;
+                }
+
                 .description__image img{
                     width: 490px;
+                }
+
+                .cardPost__description{
+                    width: fit-content;
                 }
             }
         `;
@@ -98,45 +109,30 @@ export default class LCardPost extends LitElement{
     @state()
     private _isReadMore: boolean = false;
 
-    protected override render(): TemplateResult{
-        const a = `Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's 
-                        standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a 
-                        type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, 
-                        remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing 
-                        Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's 
-                        standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a 
-                        type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, 
-                        remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing 
-                        Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem IpsumLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's 
-                        standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a 
-                        type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, 
-                        remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing 
-                        Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem IpsumLorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's 
-                        standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a 
-                        type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, 
-                        remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing 
-                        Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum`;
+    @property({attribute: false})
+    post!: Post;
 
+    protected override render(): TemplateResult{
         return html`
             <style>
                 .user__image{
-                    background-image: url("https://igd-wp-uploads-pluginaws.s3.amazonaws.com/wp-content/uploads/2016/05/30105213/Qual-e%CC%81-o-Perfil-do-Empreendedor.jpg");
+                    background-image: url(${this.post.getPhotoUser() == null ? IMAGE_DEFAULT : this.post.getPhotoUser()});
                 }
             </style>
             <div class="cardPost">
                 <div class="cardPost__user">
                     <div class="user__image"></div>
                     <div class="user__information">
-                        <p class="information__name">Leonardo Leal Araújo</p>
-                        <p class="information__date">16/07 - 10:00</p>
+                        <p class="information__name">${this.post.getUsername()}</p>
+                        <p class="information__date">${this.post.getDate()}</p>
                     </div>
                 </div>
                 <div class="cardPost__description">
                     <p class="description__text">   
-                        ${a.length <= 1300 ? 
-                            html`${a}` : 
+                        ${this.post.getText().length <= 1300 ? 
+                            html`${this.post.getText()}` : 
                             html`
-                                ${this._isReadMore ? html`${a}` : html`${a.substring(0, 1300)}`}
+                                ${this._isReadMore ? html`${this.post.getText()}` : html`${this.post.getText().substring(0, 1300)}`}
                                 <p class="text__more" @click=${() => {this._isReadMore = !this._isReadMore}}>
                                     ${this._isReadMore ? html`...Ler Menos` : html`Ler Mais...`}
                                 </p>
@@ -144,12 +140,12 @@ export default class LCardPost extends LitElement{
                         }   
                     </p>
                     <div class="description__image">
+                        <!-- <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
                         <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
                         <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
                         <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
                         <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
-                        <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
-                        <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                        <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg"> -->
                     </div>
                 </div>
                 <div class="cardPost__button">

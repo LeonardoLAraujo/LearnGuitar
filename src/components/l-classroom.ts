@@ -84,7 +84,7 @@ export default class LClassroom extends LitElement{
                 }
 
                 .classroom__classes{
-                    width: 13%;
+                    width: auto;
                 }
 
                 .classroom__information{
@@ -108,6 +108,7 @@ export default class LClassroom extends LitElement{
                     border-radius: 0px;
                 }
             }
+
         `;
     }
 

@@ -1,7 +1,8 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, property, query, state } from 'lit/decorators.js';
 import "ecv-component";
 import { IconTypes } from 'ecv-component';
+import LearnGuitar from '../learn-guitar';
 
 @customElement('l-menu')
 export default class LMenu extends LitElement{
@@ -52,7 +53,7 @@ export default class LMenu extends LitElement{
                 clip-path: polygon(50% 0%, 100% 0, 100% 100%, 0 100%, 0 0);
                 height: 179px;
                 position: absolute;
-                top: 77px;
+                top: 69px;
             }
 
             .animation__links{
@@ -106,11 +107,32 @@ export default class LMenu extends LitElement{
             }
 
             .menu__enterAccount{
-                display: none;
                 color: #fff;
                 cursor: pointer;
             }
             
+            .menu__user{
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                color: #fff;
+                cursor: pointer;
+                padding: 0rem 0.5rem 0rem 0.5rem;
+                border-radius: 8px;
+            }
+
+            .menu__user:hover{
+                background-color: var(--dark-blue);
+            }
+
+            .menu__user img{
+                width: 35px;
+                border-radius: 50%;
+            }
+
+            .menu__enterAccountDesktop{
+                display: none;
+            }
 
             @media (min-width: 1024px){
                 .menu__icon{
@@ -125,7 +147,7 @@ export default class LMenu extends LitElement{
                     display: none;
                 }
 
-                .menu__enterAccount{
+                .menu__enterAccountDesktop{
                     display: block;
                 }
             }
@@ -133,14 +155,22 @@ export default class LMenu extends LitElement{
         `;
     }
 
+    private _user: any;
+
     @state()
     private _isOpenMenu: boolean = false;
 
     @query(".animation__links")
     private _containerAnimationLinks!: HTMLDivElement;
 
+    @property({type: Boolean})
+    isLogged: boolean = false;
+
+    @property({attribute: false})
+    referenceLearnGuitar!: LearnGuitar;
+    
     private goToPage(source: string): void{
-        window.location.href = source;
+        this.referenceLearnGuitar.router.goto(source);
     }
 
     private generateLinkMenu(text: string, onPressed?: Function){
@@ -159,6 +189,21 @@ export default class LMenu extends LitElement{
         }
     }
 
+    private goToMyProfile(): void{
+        this.referenceLearnGuitar.router.goto("/profile");
+    }
+
+    private generateUserMenu(){
+        this._user = JSON.parse(localStorage.getItem("user") as string).user;
+        
+        return html`
+            <div class="menu__user" @click=${this.goToMyProfile}>
+                <img src=${this._user._photo == null ? "https://upload.wikimedia.org/wikipedia/commons/0/03/Sem_imagem.jpg" : this._user._photo}>
+                <p>${this._user._username}</p>
+            </div>
+        `;
+    }
+
     protected override render(): TemplateResult{
         return html`
             <div class="container">
@@ -173,7 +218,7 @@ export default class LMenu extends LitElement{
                         ${this.generateLinkMenu("Postagens", () => {this.goToPage("/postagens")})}
                         ${this.generateLinkMenu("Vídeos", () => {this.goToPage("/videos")})}
                     </ul>
-                    <p class="menu__enterAccount" @click=${() => {this.goToPage("/entrar")}}>Entrar</p>
+                    ${this.isLogged ? html`<div class="menu__enterAccountDesktop">${this.generateUserMenu()}</div>` : html`<p class="menu__enterAccount" @click=${() => {this.goToPage("/entrar")}}>Entrar</p>`}
                 </nav>
 
                 <div class="animation">
@@ -182,6 +227,7 @@ export default class LMenu extends LitElement{
                         ${this.generateLinkMenu("Aulas", () => {this.goToPage("/aulas"); this.openMenu()})}
                         ${this.generateLinkMenu("Postagens", () => {this.goToPage("/postagens"); this.openMenu()})}
                         ${this.generateLinkMenu("Vídeos", () => {this.goToPage("/videos"); this.openMenu()})}
+                        ${this.isLogged ? html`${this.generateUserMenu()}` : html`<p class="menu__enterAccount" @click=${() => {this.goToPage("/entrar")}}>Entrar</p>`}
                     </ul>
                 </div>
             </div>
