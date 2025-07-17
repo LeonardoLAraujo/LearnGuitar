@@ -90,6 +90,15 @@ export default class LCardPost extends LitElement{
                 font-family: PoppinsBold;
             }
 
+            .cardPost__response{
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+                background-color: #fff;
+                border-top: 8px solid var(--white);
+                padding-top: 1rem;
+            }
+
             @media (min-width: 1024px){
                 .cardPost{
                     width: 700px;
@@ -109,8 +118,43 @@ export default class LCardPost extends LitElement{
     @state()
     private _isReadMore: boolean = false;
 
+    @state()
+    private _isShowComment: boolean = false;
+
     @property({attribute: false})
     post!: Post;
+
+    private generatePostUser(): TemplateResult {
+        return html`<div class="cardPost__user">
+                        <div class="user__image"></div>
+                        <div class="user__information">
+                            <p class="information__name">${this.post.getUsername()}</p>
+                            <p class="information__date">${this.post.getDate()}</p>
+                        </div>
+                    </div>
+                    <div class="cardPost__description">
+                        <p class="description__text">   
+                            ${this.post.getText().length <= 1300 ? 
+                                html`${this.post.getText()}` : 
+                                html`
+                                    ${this._isReadMore ? html`${this.post.getText()}` : html`${this.post.getText().substring(0, 1300)}`}
+                                    <p class="text__more" @click=${() => {this._isReadMore = !this._isReadMore}}>
+                                        ${this._isReadMore ? html`...Ler Menos` : html`Ler Mais...`}
+                                    </p>
+                                `
+                            }   
+                        </p>
+                        <div class="description__image">
+                            <!-- <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                            <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                            <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                            <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                            <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                            <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg"> -->
+                        </div>
+                    </div>`;
+                    
+    }
 
     protected override render(): TemplateResult{
         return html`
@@ -120,40 +164,17 @@ export default class LCardPost extends LitElement{
                 }
             </style>
             <div class="cardPost">
-                <div class="cardPost__user">
-                    <div class="user__image"></div>
-                    <div class="user__information">
-                        <p class="information__name">${this.post.getUsername()}</p>
-                        <p class="information__date">${this.post.getDate()}</p>
-                    </div>
-                </div>
-                <div class="cardPost__description">
-                    <p class="description__text">   
-                        ${this.post.getText().length <= 1300 ? 
-                            html`${this.post.getText()}` : 
-                            html`
-                                ${this._isReadMore ? html`${this.post.getText()}` : html`${this.post.getText().substring(0, 1300)}`}
-                                <p class="text__more" @click=${() => {this._isReadMore = !this._isReadMore}}>
-                                    ${this._isReadMore ? html`...Ler Menos` : html`Ler Mais...`}
-                                </p>
-                            `
-                        }   
-                    </p>
-                    <div class="description__image">
-                        <!-- <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
-                        <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
-                        <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
-                        <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
-                        <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
-                        <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg"> -->
-                    </div>
-                </div>
+                ${this.generatePostUser()}
                 <div class="cardPost__button">
                     <ecv-icon .icon=${IconTypes.Favorite}></ecv-icon>
-                    <ecv-icon .icon=${IconTypes.Chat}></ecv-icon>
+                    <ecv-icon .icon=${IconTypes.Chat} @click=${() => {this._isShowComment = !this._isShowComment}}></ecv-icon>
                 </div>
+                ${this._isShowComment ? html`
+                    <div class="cardPost__response">
+                        ${this.generatePostUser()}
+                    </div>` : html``}
+                
             </div>
-            <div></div>
         `;
     }
 

@@ -5,7 +5,8 @@ import "../components/l-button-create-post";
 import "../components/l-create-post";
 import LCreatePost from '../components/l-create-post';
 import { Service } from '../server/service';
-import { Post, PostObject } from '../model/post';
+import { Post } from '../model/post';
+import { PostObject } from '../type/post';
 
 @customElement('l-post')
 export default class LPost extends LitElement{
@@ -68,12 +69,9 @@ export default class LPost extends LitElement{
 
     private async getAllPost(): Promise<void>{
         this.service.allPost().then((result: Array<PostObject>) => {
-            console.log(result);
             result.map((post: PostObject) => {
                 this._listAllPost.push(new Post(post));
             });
-
-            console.log(this._listAllPost);
 
             this._isFinishGetAllPostObject = true;
         })
