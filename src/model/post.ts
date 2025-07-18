@@ -3,19 +3,23 @@ import { PostObject } from "../type/post";
 export class Post {
 
     private _id: number;
-    private _user_id: number;
+    private _userId: number;
     private _text: string;
     private _username: string;
     private _photoUser?: string;
     private _date: string;
+    private _countComment: number;
+    private _countLike: number;
 
     constructor(post: PostObject){
         this._id = post.id;
-        this._user_id = post.user_id;
+        this._userId = post.userId;
         this._text = post.text;
         this._username = post.username;
         this._photoUser = post.photoUser;
         this._date = post.date;
+        this._countComment = post.countComment;
+        this._countLike = post.countLike;
     }
 
     public getId(): number{
@@ -23,7 +27,7 @@ export class Post {
     }
 
     public getUserId(): number{
-        return this._user_id;
+        return this._userId;
     }
 
     public getText(): string{
@@ -42,4 +46,11 @@ export class Post {
         return this._date;
     }
 
-}
+    public getCountComment(): number{
+        return this._countComment;
+    }
+
+    public getCountLike(): number{
+        return this._countLike;
+    }
+}   

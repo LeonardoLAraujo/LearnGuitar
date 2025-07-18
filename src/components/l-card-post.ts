@@ -1,7 +1,10 @@
-import { IconTypes } from 'ecv-component';
-import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, property, state } from 'lit/decorators.js';
+import { ECVIcon, IconTypes } from 'ecv-component';
+import {LitElement, html, css, TemplateResult, CSSResult, PropertyValues} from 'lit';
+import { customElement, property, query, queryAll, state } from 'lit/decorators.js';
 import { Post } from '../model/post';
+import { Service } from '../server/service';
+import { CommentObject } from '../type/comment';
+import { Comment } from '../model/comment';
 
 const IMAGE_DEFAULT = "https://upload.wikimedia.org/wikipedia/commons/0/03/Sem_imagem.jpg";
 
@@ -20,7 +23,7 @@ export default class LCardPost extends LitElement{
                 width: calc(100% - 32px);
                 background-color: #fff;
                 padding: 1rem;
-                gap: 20px;
+                gap: 10px;
                 max-width: 668px;
             }
 
@@ -99,6 +102,85 @@ export default class LCardPost extends LitElement{
                 padding-top: 1rem;
             }
 
+            .response__form{
+                display: flex;
+                gap: 10px;
+            }
+
+            .response__form input{
+                width: 100%;
+                font-size: 17px;
+                padding: 0.2rem;
+                font-family: PoppinsRegular;
+                outline: none;
+                border: 1px solid var(--light-gray);
+                border-radius: 5px;
+                margin-bottom: 0.5rem;
+          
+            }
+
+            .response__form button{
+                font-size: 18px;
+                font-family: PoppinsLight;
+                cursor: pointer;
+                background-color: var(--orange);
+                color: #fff;
+                border: none;
+                border-radius: 3px;
+                height: 33px;
+            }
+
+            .response__from button:hover{
+                background-color: var(--dark-orange);
+            }
+
+            .response__comment{
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .comment__detail,
+            .detail__button{
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                height: fit-content;
+            }
+
+            .detail__button{
+                gap: 10px;
+            }
+
+            .button__chat,
+            .button__favorite{
+                position: relative;
+                cursor: pointer;
+                height: fit-content;
+            }
+
+            .button__chat div{
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                color: #fff;
+                position: absolute;
+                width: 5px;
+                height: 5px;
+                background-color: var(--dark-blue);
+                padding: 0.5rem;
+                border-radius: 50%;
+                bottom: 10px;
+                left: 15px;
+                font-size: 12px;
+            }
+
+            .detail__user{
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
             @media (min-width: 1024px){
                 .cardPost{
                     width: 700px;
@@ -115,29 +197,189 @@ export default class LCardPost extends LitElement{
         `;
     }
 
+    private service: Service = new Service;
+
+    private _user = JSON.parse(localStorage.getItem("user") as string)?.user;
+
     @state()
     private _isReadMore: boolean = false;
 
     @state()
     private _isShowComment: boolean = false;
 
+    @state()
+    private _allComment: Array<Comment> = [];
+
+    @state()
+    private _allCountComment: number = 0;
+
+    @state()
+    private _isLiked: boolean = false;
+
+    @state()
+    private _isLikedComment: boolean = false;
+
+    @query(".form__input")
+    private _formInput!: HTMLInputElement;
+
+    @query(".button__like")
+    private _buttonLike!: ECVIcon;
+
+    @queryAll(".like__comment")
+    private _buttonLikeComment!: NodeListOf<ECVIcon>;
+
     @property({attribute: false})
     post!: Post;
 
-    private generatePostUser(): TemplateResult {
+    protected override firstUpdated(_changedProperties: PropertyValues): void {
+        this.getAllComment();   
+
+        if(this._user != null){
+             this.service.userLikePostCurrent(this.post.getId(), this._user?._id).then((result) => {
+                if(result.length > 0){
+                    this._buttonLike.filled = true;
+                }
+            });
+        }
+
+       
+    }
+
+    private createComment(e: MouseEvent){
+        e.preventDefault();
+
+        if(this._formInput.value.trim() == ""){
+            return;
+        }
+
+        this.service.createComment(this.post.getId(), this._user._id, this.post.getUserId(), this._formInput.value).then((result) => {
+            console.log(result);
+        });
+    }
+
+    private getAllComment(){
+        this.service.allComment(this.post.getId()).then((result: Array<CommentObject>) => {
+            result.map((comment: CommentObject) => {
+                this._allComment.push(new Comment(comment));
+            });
+        });
+    }
+
+    private openComment(){
+        this._isShowComment = !this._isShowComment
+
+        if(!this._isShowComment){
+            this._allComment = [];
+            this.getAllComment();
+        }
+    }
+
+    private likedPost(){
+        if(this._isLiked){
+            this._buttonLike.filled = true;
+
+            this.service.likePost(this.post.getId(), this._user._id).then((result) => {
+                console.log(result);
+            });
+        }else{
+            this._buttonLike.filled = false;
+
+            this.service.likedPost(this.post.getId()).then((result) => {
+                console.log(result);
+            });
+        }
+    }
+
+    private likeComment(e: MouseEvent, index: number){
+        e.preventDefault();
+
+        if(this._isLikedComment){
+            this._buttonLikeComment[index].filled = true;
+            
+            this.service.likeComment(this._allComment[index].getId(), this._user._id).then((result) => {
+                console.log(result);
+            });
+        }else{
+            this._buttonLikeComment[index].filled = false;
+
+            this.service.likedComment(this._allComment[index].getId()).then((result) => {
+                console.log(result);
+            });
+        }
+    }
+
+    private likeCommentCurrentIconFilled(index: number){
+       if(this._user != null){
+            this.service.userLikeCommentCurrent(this._allComment[index].getId(), this._user._id).then((result) => {
+                if(result.length > 0){
+                    this._buttonLikeComment[index].filled = true;
+                }else{
+                    this._buttonLikeComment[index].filled = false;
+                }
+            });
+       }
+    }
+
+    private generateCommentPost(): Array<TemplateResult>{
+        return this._allComment.map((comment: Comment, index: number) => html`<div class="comment__detail">
+                                                                    <div class="detail__user">
+                                                                        <div class="cardPost__user">
+                                                                            <div class="user__image"></div>
+                                                                            <div class="user__information">
+                                                                                <p class="information__name">${comment.getUsername()}</p>
+                                                                                <p class="information__date">${comment.getDate()}</p>
+                                                                            </div>
+                                                                        </div>
+                                                                        <div class="cardPost__description">
+                                                                            <p class="description__text">   
+                                                                                ${comment.getText().length <= 1300 ? 
+                                                                                    html`${comment.getText()}` : 
+                                                                                    html`
+                                                                                        ${this._isReadMore ? html`${comment.getText()}` : html`${comment.getText().substring(0, 1300)}`}
+                                                                                        <p class="text__more" @click=${() => {this._isReadMore = !this._isReadMore}}>
+                                                                                            ${this._isReadMore ? html`...Ler Menos` : html`Ler Mais...`}
+                                                                                        </p>
+                                                                                    `
+                                                                                }   
+                                                                            </p>
+                                                                            <div class="description__image">
+                                                                                <!-- <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                                                                                <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                                                                                <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                                                                                <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                                                                                <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg">
+                                                                                <img src="https://seuviolao.com.br/wp-content/uploads/2017/07/496599793.jpg"> -->
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="detail__button">   
+                                                                        ${this.likeCommentCurrentIconFilled(index)}
+                                                                        <div class="button__favorite" @click=${(e: MouseEvent) => {this._isLikedComment = !this._isLikedComment; this.likeComment(e, index)}}>
+                                                                            <ecv-icon class="button__like like__comment" .icon=${IconTypes.Favorite}></ecv-icon>
+                                                                            <p>${comment.getCountLike()} like</p>
+                                                                        </div>
+                                                                       <div class="button__chat">
+                                                                            <div>0</div>
+                                                                            <ecv-icon .icon=${IconTypes.Chat} ></ecv-icon>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>`);
+    }
+
+    private generatePostUser(username: string, date: string | undefined, text: string,): TemplateResult {
         return html`<div class="cardPost__user">
                         <div class="user__image"></div>
                         <div class="user__information">
-                            <p class="information__name">${this.post.getUsername()}</p>
-                            <p class="information__date">${this.post.getDate()}</p>
+                            <p class="information__name">${username}</p>
+                            <p class="information__date">${date}</p>
                         </div>
                     </div>
                     <div class="cardPost__description">
                         <p class="description__text">   
-                            ${this.post.getText().length <= 1300 ? 
-                                html`${this.post.getText()}` : 
+                            ${text.length <= 1300 ? 
+                                html`${text}` : 
                                 html`
-                                    ${this._isReadMore ? html`${this.post.getText()}` : html`${this.post.getText().substring(0, 1300)}`}
+                                    ${this._isReadMore ? html`${text}` : html`${text.substring(0, 1300)}`}
                                     <p class="text__more" @click=${() => {this._isReadMore = !this._isReadMore}}>
                                         ${this._isReadMore ? html`...Ler Menos` : html`Ler Mais...`}
                                     </p>
@@ -164,16 +406,27 @@ export default class LCardPost extends LitElement{
                 }
             </style>
             <div class="cardPost">
-                ${this.generatePostUser()}
+                ${this.generatePostUser(this.post.getUsername(), this.post.getDate(), this.post.getText())}
                 <div class="cardPost__button">
-                    <ecv-icon .icon=${IconTypes.Favorite}></ecv-icon>
-                    <ecv-icon .icon=${IconTypes.Chat} @click=${() => {this._isShowComment = !this._isShowComment}}></ecv-icon>
+                    <div class="button__favorite">
+                        <ecv-icon class="button__like" .icon=${IconTypes.Favorite} @click=${() => {this._isLiked = !this._isLiked; this.likedPost()}}></ecv-icon>
+                        <p>${this.post.getCountLike()} like</p>
+                    </div>
+                    <div class="button__chat" @click=${this.openComment}>
+                        <div>${this.post.getCountComment()}</div>
+                        <ecv-icon .icon=${IconTypes.Chat} ></ecv-icon>
+                    </div>
                 </div>
                 ${this._isShowComment ? html`
                     <div class="cardPost__response">
-                        ${this.generatePostUser()}
+                        <form class="response__form" @submit=${this.createComment}>
+                            <input class="form__input" type="text" placeholder="Escreva seu comentário">
+                            <button>Enviar</button>
+                        </form>
+                        <div class="response__comment">   
+                            ${this.generateCommentPost()}
+                        </div>
                     </div>` : html``}
-                
             </div>
         `;
     }

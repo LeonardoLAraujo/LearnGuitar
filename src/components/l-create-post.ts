@@ -102,7 +102,7 @@ export default class LCreatePost extends LitElement{
     }
 
     private body = document.querySelector("body");
-    private _user = JSON.parse(localStorage.getItem("user") as string).user;
+    private _user = JSON.parse(localStorage.getItem("user") as string)?.user;
 
     @query(".form__textarea")
     private _inputTextArea!: HTMLTextAreaElement;

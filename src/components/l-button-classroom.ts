@@ -39,6 +39,7 @@ export default class LButtonClassroom extends LitElement{
             .connectinModule__text{
                 background-color: #fff;
                 width: 100%;
+                height: -webkit-fill-available;
             }
 
             .connectinModule__text p{

@@ -55,7 +55,9 @@ export default class LPost extends LitElement{
         super();
     }
 
+
     private body = document.querySelector("body");
+
     private service: Service = new Service;
 
     @state()
@@ -80,7 +82,7 @@ export default class LPost extends LitElement{
     private generatePost(): Array<TemplateResult> {
         this.getAllPost();
         
-        return this._listAllPost.map((post: Post) => html` <l-card-post .post=${post}></l-card-post>`);
+        return this._listAllPost.map((post: Post) => html`<l-card-post .post=${post}></l-card-post>`);
     }
 
     private openCreatePost(): void{
@@ -96,7 +98,7 @@ export default class LPost extends LitElement{
                     ${this.generatePost()}
                 </div>
                 <l-create-post></l-create-post>
-                <l-button-create-post @click=${this.openCreatePost}></l-button-create-post>
+                ${JSON.parse(localStorage.getItem("user") as string)?.user != null ? html`<l-button-create-post @click=${this.openCreatePost}></l-button-create-post>` : html``}
             </div>
         `;
     }

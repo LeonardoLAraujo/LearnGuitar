@@ -1,8 +1,10 @@
 export type PostObject = {
     id: number,
     photoUser?: string,
-    user_id: number,
+    userId: number,
     text: string,
     username: string,
-    date: string
+    date: string,
+    countComment: number,
+    countLike: number
 }

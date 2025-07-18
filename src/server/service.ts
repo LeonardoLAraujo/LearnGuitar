@@ -1,4 +1,5 @@
-import { PostObject } from "../model/post";
+import { CommentObject } from "../type/comment";
+import { PostObject } from "../type/post";
 
 export class Service {
 
@@ -69,4 +70,113 @@ export class Service {
         return response;
     }
 
+    public async createComment(postId: number, userId: number, responsePostUserId: number, comment: string){
+        const request = await fetch("/createComment", {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({postId: postId, userId: userId, responsePostUserId: responsePostUserId, comment: comment})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
+
+    public async allComment(postId: number): Promise<CommentObject[]>{
+        const request = await fetch("/allComment", {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({postId: postId})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
+
+    public async likePost(postId: number, userId: number){
+        const request = await fetch("/likePost", {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({postId: postId, userId: userId})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
+
+    public async likedPost(postId: number){
+        const request = await fetch("/likedPost", {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({postId: postId})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
+
+    public async userLikePostCurrent(postId: number, userId: number){
+        const request = await fetch("/userLikePostCurrent", {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({postId: postId, userId: userId})
+        });
+        const response = request.json();
+
+        return response;
+    }
+
+    public async likeComment(commentId: number, userId: number){
+        const request = await fetch("/likeComment", {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({commentId: commentId, userId: userId})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
+
+     public async likedComment(commentId: number){
+        const request = await fetch("/likedComment", {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({commentId: commentId})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
+
+    public async userLikeCommentCurrent(commentId: number, userId: number){
+        const request = await fetch("/userLikeCommentCurrent", {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({commentId: commentId, userId: userId})
+        });
+        const response = request.json();
+
+        return response;
+    }
 }
