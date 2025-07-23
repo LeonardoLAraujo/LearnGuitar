@@ -3,7 +3,6 @@ import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
 import { customElement, property, query, queryAll, state } from 'lit/decorators.js';
 import "./l-button-classroom";
 import "lit-player-youtube";
-import { Matter } from '../type/matter';
 import LButtonClassroom from './l-button-classroom';
 import "./l-pdf";
 import { LitPlayerYoutube } from 'lit-player-youtube';
