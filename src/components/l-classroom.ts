@@ -1,27 +1,11 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, query, queryAll, state } from 'lit/decorators.js';
+import { customElement, property, query, queryAll, state } from 'lit/decorators.js';
 import "./l-card-classroom";
-import { Matter } from '../type/matter';
 import LCardClassroom from './l-card-classroom';
 import "./l-video-classroom";
 import LVideoClassroom from './l-video-classroom';
-
-const AULA: Array<Matter> = [
-    {title: "acorde Do", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."},
-    {title: "aula 2", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://lirp.cdn-website.com/bdff0937/dms3rep/multi/opt/2965433d3dd18ee0367bf5a164355485-1920w.jpg", description: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=rO_J7IfYvl4&ab_channel=TheNoitecomDaniloGentili", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-    {title: "aula", sourceVideo: "https://www.youtube.com/watch?v=iUc1dUG7YAA&ab_channel=ViaMusical", sourceImage: "https://www.viamusical.com.br/imagens/acordes/violao/C.png", description: "Aprenda o acorde de Do"},
-]
+import { Classroom } from '../model/classroom';
+import { ClassroomObject } from '../type/classroom';
 
 @customElement('l-classroom')
 export default class LClassroom extends LitElement{
@@ -35,7 +19,7 @@ export default class LClassroom extends LitElement{
             .classroom{
                 width: 100%;
                 display: flex;
-                padding-top: 2rem;
+                padding-top: 1rem;
                 justify-content: space-around;
             }
 
@@ -78,6 +62,23 @@ export default class LClassroom extends LitElement{
                 padding-bottom: 10px;
             }
 
+            .backButton{
+                max-width: 200px;
+                width: 100%;
+                margin: 20px 30px;
+                cursor: pointer;
+                background-color: var(--orange);
+                color: #fff;
+                border: none;
+                padding: 0.5rem;
+                font-family: PoppinsLight;
+                font-size: 18px;
+            }
+
+            .backButton:hover{
+                background-color: var(--dark-orange);
+            }
+
             @media (min-width: 1200px){
                 .card__module{
                     display: none;
@@ -117,8 +118,14 @@ export default class LClassroom extends LitElement{
     @state()
     private _indexCard: number = 0;
 
+    @state()
+    private loading: boolean = false;
+
     @query("l-video-classroom")
     LVideoClassroom!: LVideoClassroom;
+
+    @query(".classroom")
+    containerClasroom!: HTMLDivElement;
 
     @queryAll(".card")
     private _containerAllCard!: NodeListOf<LCardClassroom>;
@@ -126,8 +133,41 @@ export default class LClassroom extends LitElement{
     @queryAll(".card__module")
     cardModule!: NodeListOf<HTMLDivElement>;
 
+    @state()
+    listClassroom: Array<Classroom> = [];
+
+    @property({type: Number})
+    indexClassroom: number = 0;
+
     protected override firstUpdated(): void {
+        this.getClassroom();
+
         this._containerAllCard[0]?.click();
+    }
+
+    private backPage(): void{
+        window.location.reload();
+    }
+
+    private getClassroom(){ 
+        const list = JSON.parse(sessionStorage.getItem("classroom") as string) as Array<ClassroomObject>;
+
+        list.map((classroom: ClassroomObject) => {
+            this.listClassroom.push(new Classroom(classroom));
+        });
+
+        if(list.length == 0){
+            this.containerClasroom.style.display = "none";
+        }else{
+            this.containerClasroom.style.display = "flex";
+        }
+
+        this.loading = true;
+
+        this.LVideoClassroom.classroom = this.listClassroom[this._indexCard];
+
+        this.LVideoClassroom.litPlayerYoutube?.setUrlVideo(this.listClassroom[this._indexCard]?.getSourceVideo());
+        this.LVideoClassroom.litPlayerYoutube?.hiddenContainerPlayerVideoAndShowPauseVideo();
     }
 
     private resetAllCardClassroom(): void{
@@ -143,30 +183,29 @@ export default class LClassroom extends LitElement{
 
         element.isCurrent = true;
         this._indexCard = index;
-
         
         if(window.getComputedStyle(this.cardModule[index]).getPropertyValue("display") != "none"){
             this.connectionModule = this.shadowRoot?.querySelector(".connectionModule") as LVideoClassroom;
 
-            this.cardModule[index].insertAdjacentHTML("afterbegin", `<l-video-classroom class="connectionModule" .classroom=${AULA[this._indexCard]}></l-video-classroom>`);
+            this.cardModule[index].insertAdjacentHTML("afterbegin", `<l-video-classroom class="connectionModule" .classroom=${this.listClassroom[this._indexCard]}></l-video-classroom>`);
 
-            console.log(this.connectionModule);
             this.connectionModule?.remove();
         }else{
-            this.LVideoClassroom.classroom = AULA[this._indexCard];
+            this.LVideoClassroom.classroom = this.listClassroom[this._indexCard];
 
-            this.LVideoClassroom.litPlayerYoutube?.setUrlVideo(AULA[this._indexCard]?.sourceVideo);
+            this.LVideoClassroom.litPlayerYoutube?.setUrlVideo(this.listClassroom[this._indexCard]?.getSourceVideo());
             this.LVideoClassroom.litPlayerYoutube?.hiddenContainerPlayerVideoAndShowPauseVideo();
         }
     }
 
     private generateCards(): Array<TemplateResult> {
-        return AULA.map((_classroom: Matter, index: number) => html`<l-card-classroom class="card" index=${index} @click=${(e: MouseEvent) => {this.alterCardCurrent(e, index)}}></l-card-classroom>
+        return this.listClassroom.map((_classroom: Classroom, index: number) => html`<l-card-classroom class="card" index=${index} @click=${(e: MouseEvent) => {this.alterCardCurrent(e, index)}}></l-card-classroom>
                                                                     <div class="card__module"></div>`);
     }
 
     protected override render(): TemplateResult{
         return html`
+            <button class="backButton" @click=${this.backPage}>Voltar</button>
             <div class="classroom">
                 <div class="classroom__classes">
                     <h1>Aulas</h1>
@@ -175,8 +214,8 @@ export default class LClassroom extends LitElement{
                     </div>
                 </div>
                 <div class="classroom__information">
-                    <h1>${AULA[this._indexCard].title}</h1>
-                    <p>${AULA[this._indexCard].description}</p>
+                    <h1>${this.listClassroom[this._indexCard]?.getTitle()}</h1>
+                    <p>${this.listClassroom[this._indexCard]?.getDescription()}</p>
                     <l-video-classroom></l-video-classroom>
                 </div>
             </div>

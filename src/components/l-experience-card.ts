@@ -15,6 +15,7 @@ export default class LExperienceCard extends LitElement{
             .card{
                 display: flex;
                 flex-direction: column;
+                justify-content: center;
                 align-items: center;
                 cursor: pointer;
                 gap: 15px;

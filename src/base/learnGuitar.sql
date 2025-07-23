@@ -45,3 +45,20 @@ CREATE TABLE likeComment(
 	CONSTRAINT fk_likeComment_comment FOREIGN KEY (comment_id) REFERENCES comment(id),
 	CONSTRAINT fk_likeComment_user FOREIGN KEY (user_id) REFERENCES user(id)
 );
+
+CREATE TABLE category(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	text VARCHAR(100)
+);
+
+CREATE TABLE classroom(
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	category_id INT,
+	title VARCHAR(100) NOT NULL,
+	sourceVideo VARCHAR(255) NOT NULL,
+	description VARCHAR(255) NOT NULL,
+	sourcePdf VARCHAR(255) NULL,
+	CONSTRAINT fk_category_classroom FOREIGN KEY (category_id) REFERENCES category(id)
+);
+
+INSERT INTO category(text) VALUES ("iniciante"), ("intermediário"), ("Avançado")

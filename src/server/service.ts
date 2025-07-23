@@ -179,4 +179,32 @@ export class Service {
 
         return response;
     }
+
+    public async createClassroom(category: number, title: string, sourceVideo: string, description: string){
+        const request = await fetch("/createClassroom", {
+            method: 'post',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({category: category, title: title, sourceVideo: sourceVideo, description: description})
+        });
+
+        const result = await request.json();
+
+        return result;
+    }   
+
+    public async allClassroom(idCategory: number) {
+        const request = await fetch("/allClassroom", {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({id: idCategory})
+        });
+
+        const result = await request.json();
+
+        return result;
+    }
 }

@@ -7,6 +7,7 @@ import { Matter } from '../type/matter';
 import LButtonClassroom from './l-button-classroom';
 import "./l-pdf";
 import { LitPlayerYoutube } from 'lit-player-youtube';
+import { Classroom } from '../model/classroom';
 
 @customElement('l-video-classroom')
 export default class LVideoClassroom extends LitElement{
@@ -60,12 +61,14 @@ export default class LVideoClassroom extends LitElement{
     private _containerAllButtonClassroom!: NodeListOf<LButtonClassroom>;
 
     @property({attribute: false})
-    classroom!: Matter;
+    classroom!: Classroom;
 
     protected override firstUpdated(): void {
         setTimeout(() => {
             this._containerAllButtonClassroom[0]?.currentButton();
         }, 1);
+
+        console.log(this.classroom?.getSourceVideo());
     }
 
     private resetButtonContainer(): void{
@@ -100,7 +103,7 @@ export default class LVideoClassroom extends LitElement{
                 }
             </style>
             <div class="videoClassroom">
-                <lit-player-youtube video=${this.classroom?.sourceVideo}></lit-player-youtube>
+                <lit-player-youtube video=${this.classroom?.getSourceVideo()}></lit-player-youtube>
                 <l-pdf sourcePdf="https://www.objetivas.com.br/arquivos/2017/09/Qh4yWkBpYm_anexo.pdf"></l-pdf>
                 <div class="videoClassroom__button">
                     <l-button-classroom icon=${IconTypes.Youtube} text="Vídeo" @click=${this.alterForVideo}></l-button-classroom>

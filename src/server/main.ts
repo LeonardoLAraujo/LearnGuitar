@@ -346,7 +346,45 @@ export class Setting {
 			}
 		});
 
+		this.app.post("/createClassroom", (req: any, resp: any) => {
+			try{
+				const INSERT_CLASSROOM = "INSERT INTO classroom(category_id, title, sourcevideo, description, sourcepdf) VALUES(?, ?, ?, ?, NULL)";
 
+				this.mysqlInstance.getConnection().query({
+					sql: INSERT_CLASSROOM,
+					values: [req.body.category, req.body.title, req.body.sourceVideo, req.body.description]
+				}, (error: MysqlError, result) => {
+
+					if(error != null){
+						throw error;
+					}
+
+					if(result){
+						resp.json({sucess: true, message: "Aula cadastrada com Sucesso!"})
+					}
+
+				});
+
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
+
+		this.app.post("/allClassroom", (req: any, resp: any) => {
+			try{
+				this.mysqlInstance.getConnection().query(`SELECT * FROM classroom WHERE category_id = ${req.body.id}`, (error: MysqlError, result: any) => {
+					if(error){
+						throw error;
+					}
+
+					if(result){
+						return resp.json(result);
+					}
+				});
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
 	}	
 
 	listenSocket(): void{
