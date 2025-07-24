@@ -385,6 +385,43 @@ export class Setting {
 				console.log(`Error: ${error}`);
 			}
 		});
+
+		this.app.post("/registerVideo", (req: any, resp: any) => {
+			try{
+				const INSERT_VIDEO = "INSERT INTO video(title, description, sourcevideoyoutube, tumblr) VALUES(?, ?, ?, NULL)";
+
+				this.mysqlInstance.getConnection().query({
+					sql: INSERT_VIDEO,
+					values: [req.body.title, req.body.description, req.body.sourceVideoYoutube, req.body.tumblr]
+				}, (error: MysqlError, result) => {
+					if(error != null){
+						throw error;
+					}
+
+					if(result){
+						return resp.json({sucess: true, message: "Video registrado com Sucesso!"});
+					}
+				});
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
+
+		this.app.post("/allVideo", (_req: any, resp: any) => {
+			try{
+				this.mysqlInstance.getConnection().query("SELECT * FROM video", (error: MysqlError, result: any) => {
+					if(error != null){
+						throw error;
+					}
+
+					if(result){
+						return resp.json(result);
+					}
+				});
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
 	}	
 
 	listenSocket(): void{

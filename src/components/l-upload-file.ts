@@ -1,5 +1,5 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 
 @customElement('l-upload-file')
 export default class LUploadFile extends LitElement{
@@ -119,6 +119,9 @@ export default class LUploadFile extends LitElement{
     @query("#preview")
     private _preview!: HTMLDivElement;
 
+    @property({type: String})
+    placeholder: string = "Arraste o PDF aqui"
+
     private showPreview(files: any){
         this._preview.innerHTML = '';
 
@@ -193,7 +196,7 @@ export default class LUploadFile extends LitElement{
                         <path d="M19.35 10.04a7.49 7.49 0 0 0-14-2A6 6 0 0 0 6 20h13a5 5 0 0 0 .35-9.96zM13 11v4h-2v-4H8l4-4 4 4h-3z"/>
                     </svg>
 
-                    <div class="upload-text">Arraste o PDF aqui</div>
+                    <div class="upload-text">${this.placeholder}</div>
                     <div class="upload-or">ou</div>
 
                     <label class="upload-button">

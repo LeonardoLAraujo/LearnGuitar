@@ -120,7 +120,7 @@ export default class LClasses extends LitElement{
            <l-create-classroom .onPressedCloseButton=${() => {this.closeCreateClassroom()}}></l-create-classroom>
             <div class="classes">
                 ${this._isClasseroom ? html`` : html`<button class="createButton" @click=${this.openCreateClassroom}>Cadastrar Aula</button>`}
-                ${this._isClasseroom ? html`<l-classroom .indexClassroom=${this.indexClassroom}></l-classroom>` : html`<h1>Escolha seu Nível:</h1>
+                ${this._isClasseroom ? html`<l-classroom .indexClassroom=${this.indexClassroom} .onPressedClose=${() => {this._isClasseroom = !this._isClasseroom}}></l-classroom>` : html`<h1>Escolha seu Nível:</h1>
                                                                                                                         <div class="classes__card">
                                                                                                                             ${this.generateCardClasses()}
                                                                                                                         </div>`}

@@ -87,6 +87,7 @@ export default class LVideoClassroom extends LitElement{
         this.resetButtonContainer();
         this._isVideo = true;
 
+        this.litPlayerYoutube.stopVideo();
         this._containerAllButtonClassroom[1].currentButton();
     }
 

@@ -62,3 +62,11 @@ CREATE TABLE classroom(
 );
 
 INSERT INTO category(text) VALUES ("iniciante"), ("intermediário"), ("Avançado")
+
+CREATE TABLE video (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	title VARCHAR(100) NOT NULL,
+	description VARCHAR(255) NULL,
+	tumblr VARCHAR(255) NULL,
+	sourceVideoYoutube VARCHAR(255) NOT NULL
+);

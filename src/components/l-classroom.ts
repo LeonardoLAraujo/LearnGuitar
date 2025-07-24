@@ -6,6 +6,7 @@ import "./l-video-classroom";
 import LVideoClassroom from './l-video-classroom';
 import { Classroom } from '../model/classroom';
 import { ClassroomObject } from '../type/classroom';
+import "lit-player-youtube";
 
 @customElement('l-classroom')
 export default class LClassroom extends LitElement{
@@ -139,22 +140,25 @@ export default class LClassroom extends LitElement{
     @property({type: Number})
     indexClassroom: number = 0;
 
+    @property({attribute: false})
+    onPressedClose: Function = () => {};
+
     protected override firstUpdated(): void {
         this.getClassroom();
 
         this._containerAllCard[0]?.click();
     }
 
-    private backPage(): void{
-        window.location.reload();
-    }
-
     private getClassroom(){ 
         const list = JSON.parse(sessionStorage.getItem("classroom") as string) as Array<ClassroomObject>;
 
+        const listClassroom: Array<Classroom> = [];
+
         list.map((classroom: ClassroomObject) => {
-            this.listClassroom.push(new Classroom(classroom));
+            listClassroom.push(new Classroom(classroom));
         });
+
+        this.listClassroom = listClassroom;
 
         if(list.length == 0){
             this.containerClasroom.style.display = "none";
@@ -162,12 +166,14 @@ export default class LClassroom extends LitElement{
             this.containerClasroom.style.display = "flex";
         }
 
-        this.loading = true;
-
         this.LVideoClassroom.classroom = this.listClassroom[this._indexCard];
 
         this.LVideoClassroom.litPlayerYoutube?.setUrlVideo(this.listClassroom[this._indexCard]?.getSourceVideo());
         this.LVideoClassroom.litPlayerYoutube?.hiddenContainerPlayerVideoAndShowPauseVideo();
+
+        setTimeout(() => {
+            this._containerAllCard[0]?.click();
+        }, 200);
     }
 
     private resetAllCardClassroom(): void{
@@ -205,7 +211,7 @@ export default class LClassroom extends LitElement{
 
     protected override render(): TemplateResult{
         return html`
-            <button class="backButton" @click=${this.backPage}>Voltar</button>
+            <button class="backButton" @click=${this.onPressedClose}>Voltar</button>
             <div class="classroom">
                 <div class="classroom__classes">
                     <h1>Aulas</h1>

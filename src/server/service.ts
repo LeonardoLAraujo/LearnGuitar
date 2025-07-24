@@ -207,4 +207,31 @@ export class Service {
 
         return result;
     }
+
+    public async registerVideo(title: string, description: string, sourceVideoYoutube: string, tumblr?: string){
+        const request = await fetch("/registerVideo", {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({title: title, description: description, sourceVideoYoutube: sourceVideoYoutube, tumblr: tumblr})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
+
+    public async allVideo(){
+        const request = await fetch("/allVideo", {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
 }
