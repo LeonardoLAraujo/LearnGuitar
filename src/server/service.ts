@@ -65,6 +65,7 @@ export class Service {
                 'Content-Type': 'application/json'
             },
         });
+        
         const response = await request.json();
 
         return response;
@@ -112,13 +113,13 @@ export class Service {
         return response;
     }
 
-    public async likedPost(postId: number){
+    public async likedPost(postId: number, userId: number){
         const request = await fetch("/likedPost", {
             method: 'post',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({postId: postId})
+            body: JSON.stringify({postId: postId, userId: userId})
         });
 
         const response = await request.json();
@@ -153,13 +154,13 @@ export class Service {
         return response;
     }
 
-     public async likedComment(commentId: number){
+     public async likedComment(commentId: number, userId: number){
         const request = await fetch("/likedComment", {
             method: 'post',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({commentId: commentId})
+            body: JSON.stringify({commentId: commentId, userId})
         });
 
         const response = await request.json();

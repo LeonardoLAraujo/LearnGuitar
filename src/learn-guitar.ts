@@ -1,5 +1,5 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, query, state } from 'lit/decorators.js';
 import "./client/l-home";
 import "./client/l-menu";
 import "./client/l-classes";
@@ -9,10 +9,13 @@ import "./components/l-login";
 import "./client/l-profile-user";
 import { Router } from '@lit-labs/router';
 import LMenu from './client/l-menu';
+import { ISocket } from './interfaces/isocket';
+import { DefaultEventsMap } from '@socket.io/component-emitter';
+import { io, Socket } from 'socket.io-client';
 
 
 @customElement('learn-guitar')
-export default class LearnGuitar extends LitElement{
+export class LearnGuitar extends LitElement implements ISocket{
 
     static override get styles(): CSSResult{
         return css`
@@ -23,13 +26,16 @@ export default class LearnGuitar extends LitElement{
         `;
     }
 
+    @state()
+    public socket!: Socket<DefaultEventsMap, DefaultEventsMap>;
+
     @query("l-menu")
     lMenu!: LMenu;
     
     public router  = new Router(this, [
         {path: '/',             render: () => html`<l-home></l-home>`},
         {path: '/aulas',        render: () => html`<l-classes></l-classes>`},
-        {path: '/postagens',    render: () => html`<l-post></l-post>`},
+        {path: '/postagens',    render: () => html`<l-post .referenceLearnGuitar=${this}></l-post>`},
         {path: '/videos',       render: () => html`<l-video></l-video>`},
         {path: '/entrar',       render: () => html`<l-login .referenceLearnGuitar=${this}></l-login>`},
         {path: '/profile',      render: () => html`<l-profile-user></l-profile-user>`}
@@ -37,6 +43,8 @@ export default class LearnGuitar extends LitElement{
 
     override connectedCallback(): void {
         super.connectedCallback();
+
+        this.socket = io();
     }
 
     protected override firstUpdated(): void {

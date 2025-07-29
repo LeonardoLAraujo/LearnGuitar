@@ -5,6 +5,11 @@ import { Post } from '../model/post';
 import { Service } from '../server/service';
 import { CommentObject } from '../type/comment';
 import { Comment } from '../model/comment';
+import { LPost } from '../client/l-post';
+import { PostObject } from '../type/post';
+import { Util } from '../util/util';
+import { until } from 'lit/directives/until.js';
+import "./l-loading";
 
 const IMAGE_DEFAULT = "https://upload.wikimedia.org/wikipedia/commons/0/03/Sem_imagem.jpg";
 
@@ -207,11 +212,7 @@ export default class LCardPost extends LitElement{
     @state()
     private _isShowComment: boolean = false;
 
-    @state()
     private _allComment: Array<Comment> = [];
-
-    @state()
-    private _allCountComment: number = 0;
 
     @state()
     private _isLiked: boolean = false;
@@ -229,20 +230,36 @@ export default class LCardPost extends LitElement{
     private _buttonLikeComment!: NodeListOf<ECVIcon>;
 
     @property({attribute: false})
+    referencePost!: LPost;
+
+    @property({attribute: false})
     post!: Post;
 
-    protected override firstUpdated(_changedProperties: PropertyValues): void {
-        this.getAllComment();   
+    override connectedCallback(): void {
+        super.connectedCallback();
 
+        const comments: Array<Comment> = [];
+
+        this.referencePost.referenceLearnGuitar.socket.on("comment", (result: Array<CommentObject>) => {
+            result.map((comment: CommentObject) => {
+                comments.push(new Comment(comment));
+            });
+
+            this._allComment = Util.alterPositionArrayComment(comments);
+
+            this.requestUpdate();
+        });
+    }
+
+    protected override firstUpdated(_changedProperties: PropertyValues): void {
         if(this._user != null){
              this.service.userLikePostCurrent(this.post.getId(), this._user?._id).then((result) => {
                 if(result.length > 0){
                     this._buttonLike.filled = true;
+                    this._isLiked = true;
                 }
             });
         }
-
-       
     }
 
     private createComment(e: MouseEvent){
@@ -255,13 +272,11 @@ export default class LCardPost extends LitElement{
         this.service.createComment(this.post.getId(), this._user._id, this.post.getUserId(), this._formInput.value).then((result) => {
             console.log(result);
         });
-    }
 
-    private getAllComment(){
+        this._formInput.value = "";
+
         this.service.allComment(this.post.getId()).then((result: Array<CommentObject>) => {
-            result.map((comment: CommentObject) => {
-                this._allComment.push(new Comment(comment));
-            });
+            this.referencePost.referenceLearnGuitar.socket.emit("comment", result);
         });
     }
 
@@ -270,11 +285,11 @@ export default class LCardPost extends LitElement{
 
         if(!this._isShowComment){
             this._allComment = [];
-            this.getAllComment();
         }
     }
 
     private likedPost(){
+        console.log(this._isLiked);
         if(this._isLiked){
             this._buttonLike.filled = true;
 
@@ -284,10 +299,15 @@ export default class LCardPost extends LitElement{
         }else{
             this._buttonLike.filled = false;
 
-            this.service.likedPost(this.post.getId()).then((result) => {
+            this.service.likedPost(this.post.getId(), this._user._id).then((result) => {
                 console.log(result);
             });
         }
+
+        
+        this.service.allPost().then((result: Array<PostObject>) => {
+            this.referencePost.referenceLearnGuitar.socket.emit("posts", result);
+        });
     }
 
     private likeComment(e: MouseEvent, index: number){
@@ -299,13 +319,18 @@ export default class LCardPost extends LitElement{
             this.service.likeComment(this._allComment[index].getId(), this._user._id).then((result) => {
                 console.log(result);
             });
+
         }else{
             this._buttonLikeComment[index].filled = false;
 
-            this.service.likedComment(this._allComment[index].getId()).then((result) => {
+            this.service.likedComment(this._allComment[index].getId(), this._user._id).then((result) => {
                 console.log(result);
             });
         }
+
+        this.service.allComment(this.post.getId()).then((result: Array<CommentObject>) => {
+            this.referencePost.referenceLearnGuitar.socket.emit("comment", result);
+        });
     }
 
     private likeCommentCurrentIconFilled(index: number){
@@ -320,7 +345,17 @@ export default class LCardPost extends LitElement{
        }
     }
 
-    private generateCommentPost(): Array<TemplateResult>{
+    private async generateCommentPost(): Promise<TemplateResult[]>{
+        const comments: Array<Comment> = [];
+
+        const listComment = await this.service.allComment(this.post.getId());
+
+        listComment.map((comment: CommentObject) => {
+            comments.push(new Comment(comment));
+        });
+
+        this._allComment = Util.alterPositionArrayComment(comments);
+
         return this._allComment.map((comment: Comment, index: number) => html`<div class="comment__detail">
                                                                     <div class="detail__user">
                                                                         <div class="cardPost__user">
@@ -402,18 +437,18 @@ export default class LCardPost extends LitElement{
         return html`
             <style>
                 .user__image{
-                    background-image: url(${this.post.getPhotoUser() == null ? IMAGE_DEFAULT : this.post.getPhotoUser()});
+                    background-image: url(${this.post?.getPhotoUser() == null ? IMAGE_DEFAULT : this.post?.getPhotoUser()});
                 }
             </style>
             <div class="cardPost">
-                ${this.generatePostUser(this.post.getUsername(), this.post.getDate(), this.post.getText())}
+                ${this.generatePostUser(this.post?.getUsername(), this.post?.getDate(), this.post?.getText())}
                 <div class="cardPost__button">
                     <div class="button__favorite">
                         <ecv-icon class="button__like" .icon=${IconTypes.Favorite} @click=${() => {this._isLiked = !this._isLiked; this.likedPost()}}></ecv-icon>
-                        <p>${this.post.getCountLike()} like</p>
+                        <p>${this.post?.getCountLike()} like</p>
                     </div>
                     <div class="button__chat" @click=${this.openComment}>
-                        <div>${this.post.getCountComment()}</div>
+                        <div>${this.post?.getCountComment()}</div>
                         <ecv-icon .icon=${IconTypes.Chat} ></ecv-icon>
                     </div>
                 </div>
@@ -424,7 +459,7 @@ export default class LCardPost extends LitElement{
                             <button>Enviar</button>
                         </form>
                         <div class="response__comment">   
-                            ${this.generateCommentPost()}
+                            ${until(this.generateCommentPost(), html`<l-loading></l-loading>`)}
                         </div>
                     </div>` : html``}
             </div>

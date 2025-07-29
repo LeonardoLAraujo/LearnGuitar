@@ -1,7 +1,9 @@
 import { IconTypes } from 'ecv-component';
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, query } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import { Service } from '../server/service';
+import { LPost } from '../client/l-post';
+import { PostObject } from '../type/post';
 
 @customElement('l-create-post')
 export default class LCreatePost extends LitElement{
@@ -16,7 +18,7 @@ export default class LCreatePost extends LitElement{
             .createPost{
                 display: flex;
                 flex-direction: column;
-                position: absolute;
+                position: fixed;
                 align-items: center;
                 top: 0;
                 z-index: 5;
@@ -107,6 +109,9 @@ export default class LCreatePost extends LitElement{
     @query(".form__textarea")
     private _inputTextArea!: HTMLTextAreaElement;
 
+    @property({attribute: false})
+    referencePost!: LPost;
+
     private close(): void{
         this.style.display = "none";
         this.body!.style!.overflowY = "scroll";
@@ -123,6 +128,10 @@ export default class LCreatePost extends LitElement{
 
         service.createPost(this._user._id, this._inputTextArea.value).then((result) => {
             console.log(result);
+        });
+
+        service.allPost().then((result: Array<PostObject>) => {
+            this.referencePost.referenceLearnGuitar.socket.emit("posts", result);
         });
 
         this.close();

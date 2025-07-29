@@ -106,7 +106,9 @@ export default class LClasses extends LitElement{
 
             sessionStorage.setItem("classroom", JSON.stringify(listClassroom));
 
-            this._isClasseroom = true;
+           
+        }).then(() => {
+             this._isClasseroom = true;
         });
 
     }

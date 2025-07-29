@@ -191,7 +191,7 @@ export default class LVideo extends LitElement{
     @query("l-create-video")
     private _lCreateVideo!: LCreateVideo;
 
-    @query("lit-player-youtube")
+    @query(".player__video")
     private _litPlayerYoutube!: LitPlayerYoutube;
 
     protected override firstUpdated(): void {
@@ -206,10 +206,12 @@ export default class LVideo extends LitElement{
 
     private openVideo(sourceVideoYoutube: string): void{
         this._containerModalVideo.style.display = "flex";
-        this._body!.style!.overflowY = "hidden";
+        this._body!.style!.overflowY = "hidden";    
 
-        this._litPlayerYoutube.setUrlVideo(sourceVideoYoutube);
+        this._litPlayerYoutube.video = sourceVideoYoutube;
         this._litPlayerYoutube.hiddenContainerPlayerVideoAndShowPauseVideo();
+
+        this.requestUpdate();
     }
 
     private closeRegisterVideo(): void{
@@ -271,7 +273,7 @@ export default class LVideo extends LitElement{
                     <div class="player__close" @click=${this.closeModalVideo}>
                         <ecv-icon .icon=${IconTypes.Close} .iconStyle=${{color: "var(--dark-green)", size: "30px"}}></ecv-icon>
                     </div>
-                    <lit-player-youtube></lit-player-youtube>
+                    <lit-player-youtube class="player__video"></lit-player-youtube>
                 </div>
             </div>
         `;

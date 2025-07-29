@@ -6,6 +6,8 @@ import MySQL from "../base/mysql";
 import { MysqlError } from "mysql";
 import cors from "cors";
 import { ObjectUser } from "../model/user";
+import { PostObject } from "../type/post";
+import { CommentObject } from "../type/comment";
 
 const IP = "10.113.26.78";
 
@@ -178,6 +180,7 @@ export class Setting {
 																				)
 																				FROM post p
 																				JOIN USER u ON p.user_id = u.id
+																				ORDER BY p.date DESC
 																			),
 																			JSON_ARRAY()
 																		) AS POSTS`, 
@@ -255,7 +258,7 @@ export class Setting {
 
 		this.app.post("/likedPost", (req: any, resp: any) => {
 			try{
-				this.mysqlInstance.getConnection().query(`DELETE FROM likePost WHERE post_id=${req.body.postId}`, (error: MysqlError, result: any) => {
+				this.mysqlInstance.getConnection().query(`DELETE FROM likePost WHERE post_id=${req.body.postId} AND user_id=${req.body.userId}`, (error: MysqlError, result: any) => {
 					if(error != null){
 						throw error;
 					}
@@ -312,7 +315,7 @@ export class Setting {
 
 		this.app.post("/likedComment", (req: any, resp: any) => {
 			try{
-				this.mysqlInstance.getConnection().query(`DELETE FROM likeComment WHERE comment_id=${req.body.commentId}`, (error: MysqlError, result: any) => {
+				this.mysqlInstance.getConnection().query(`DELETE FROM likeComment WHERE comment_id=${req.body.commentId} AND user_id=${req.body.userId}`, (error: MysqlError, result: any) => {
 					if(error != null){
 						throw error;
 					}
@@ -434,6 +437,14 @@ export class Setting {
 
 			socket.on("logIn", () => {
 				this.io.emit('logou', "logou");
+			});
+
+			socket.on("posts", (request: Array<PostObject>) => {
+				this.io.emit("posts", request);
+			});
+			
+			socket.on("comment", (request: Array<CommentObject>) => {
+				this.io.emit("comment", request);
 			});
 		});
 	}

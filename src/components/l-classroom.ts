@@ -119,10 +119,7 @@ export default class LClassroom extends LitElement{
     @state()
     private _indexCard: number = 0;
 
-    @state()
-    private loading: boolean = false;
-
-    @query("l-video-classroom")
+    @query(".information__video")
     LVideoClassroom!: LVideoClassroom;
 
     @query(".classroom")
@@ -222,7 +219,7 @@ export default class LClassroom extends LitElement{
                 <div class="classroom__information">
                     <h1>${this.listClassroom[this._indexCard]?.getTitle()}</h1>
                     <p>${this.listClassroom[this._indexCard]?.getDescription()}</p>
-                    <l-video-classroom></l-video-classroom>
+                    <l-video-classroom class="information__video"></l-video-classroom>
                 </div>
             </div>
         `;

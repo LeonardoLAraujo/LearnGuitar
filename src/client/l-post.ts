@@ -1,5 +1,5 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, property, query } from 'lit/decorators.js';
 import "../components/l-card-post";
 import "../components/l-button-create-post";
 import "../components/l-create-post";
@@ -7,9 +7,13 @@ import LCreatePost from '../components/l-create-post';
 import { Service } from '../server/service';
 import { Post } from '../model/post';
 import { PostObject } from '../type/post';
+import {LearnGuitar} from '../learn-guitar';
+import { Util } from '../util/util';
+import { until } from 'lit/directives/until.js';
+import "../components/l-loading";
 
 @customElement('l-post')
-export default class LPost extends LitElement{
+export class LPost extends LitElement{
 
     static override get styles(): CSSResult{
         return css`
@@ -60,29 +64,44 @@ export default class LPost extends LitElement{
 
     private service: Service = new Service;
 
-    @state()
     private _listAllPost: Array<Post> = [];
-
-    @state()
-    private _isFinishGetAllPostObject: boolean = false;
 
     @query("l-create-post")
     private _lCreatePost!: LCreatePost;
+    
+    @property({attribute: false})
+    referenceLearnGuitar!: LearnGuitar;
 
-    private async getAllPost(): Promise<void>{
-        this.service.allPost().then((result: Array<PostObject>) => {
+    override connectedCallback(): void {
+        super.connectedCallback();
+
+        const socketPost: Array<Post> = [];
+
+        this._listAllPost = [];
+        
+        this.referenceLearnGuitar.socket.on("posts", async (result: Array<PostObject>) => {
             result.map((post: PostObject) => {
-                this._listAllPost.push(new Post(post));
+                socketPost.push(new Post(post));
             });
 
-            this._isFinishGetAllPostObject = true;
-        })
+            this._listAllPost = Util.alterPositionArray(socketPost);
+
+            this.requestUpdate();
+        });
     }
 
-    private generatePost(): Array<TemplateResult> {
-        this.getAllPost();
-        
-        return this._listAllPost.map((post: Post) => html`<l-card-post .post=${post}></l-card-post>`);
+
+    private async generatePost(): Promise<TemplateResult[]> {
+        const listPost: Array<PostObject> = await this.service.allPost();
+        const posts: Array<Post> = [];
+
+        listPost.map((post: PostObject) => {
+            posts.push(new Post(post));
+        });
+
+        this._listAllPost = Util.alterPositionArray(posts);
+
+        return this._listAllPost.map((post: Post) => html`<l-card-post .post=${post} .referencePost=${this}></l-card-post>`);
     }
 
     private openCreatePost(): void{
@@ -95,9 +114,9 @@ export default class LPost extends LitElement{
             <div class="post">
                 <h1>Postagens</h1>
                 <div class="post__card">
-                    ${this.generatePost()}
+                    ${until(this.generatePost(), html`<l-loading></l-loading>`)}
                 </div>
-                <l-create-post></l-create-post>
+                <l-create-post .referencePost=${this}></l-create-post>
                 ${JSON.parse(localStorage.getItem("user") as string)?.user != null ? html`<l-button-create-post @click=${this.openCreatePost}></l-button-create-post>` : html``}
             </div>
         `;
