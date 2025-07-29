@@ -425,6 +425,43 @@ export class Setting {
 				console.log(`Error: ${error}`);
 			}
 		});
+
+		this.app.post("/myPosts", (req: any, resp: any) => {
+			try{
+				this.mysqlInstance.getConnection().query(`SELECT IFNULL (
+																			(
+																				SELECT JSON_ARRAYAGG(
+																					JSON_OBJECT(
+																						'id', p.id,
+																						'text', p.text,
+																						'userId', u.id,
+																						'username', u.username,
+																						'photoUser', u.photo,
+																						'date', p.date,
+																						'countComment', (SELECT COUNT(c.id) FROM comment c WHERE p.id = c.post_id ),
+																						'countLike', (SELECT COUNT(l.id) FROM likePost l WHERE p.id = l.post_id )
+																					)
+																				)
+																				FROM post p
+																				JOIN USER u ON p.user_id = ${req.body.userId}
+																				ORDER BY p.date DESC
+																			),
+																			JSON_ARRAY()
+																		) AS POSTS`, 
+					(error: MysqlError, result: any) => {
+						if(error != null){
+							throw error;
+						}
+
+						if(result){
+							return resp.json(result[0].POSTS);
+						}
+					}
+				);
+			}catch(error){
+				console.log(`Error: ${error}`)
+			}
+		});
 	}	
 
 	listenSocket(): void{

@@ -1,5 +1,6 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
 import { customElement } from 'lit/decorators.js';
+import { PostObject } from '../type/post';
 
 @customElement('l-profile-user')
 export default class LProfileUser extends LitElement{
@@ -90,7 +91,6 @@ export default class LProfileUser extends LitElement{
     private _user = JSON.parse(localStorage.getItem("user") as string).user;
 
     private generateInformationUser(label: string, value: string){
-        console.log(this._user);
         return html`
             <div class="information__user">
                 <p class="user__label">${label}</p>
@@ -98,6 +98,10 @@ export default class LProfileUser extends LitElement{
             </div>
         `;
     }
+
+    // private async getMyPosts(): Promise<PostObject[]>{
+
+    // }   
 
     protected override render(): TemplateResult{
         return html`
