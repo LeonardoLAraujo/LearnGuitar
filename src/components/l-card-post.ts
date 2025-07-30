@@ -18,12 +18,6 @@ export default class LCardPost extends LitElement{
 
     static override get styles(): CSSResult{
         return css`
-            :host{
-                width: fit-content;
-                height: -webkit-fill-available;
-                display: inline-block;
-            }
-
             p{
                 margin: 0;
             }
@@ -364,7 +358,7 @@ export default class LCardPost extends LitElement{
         return this._allComment.map((comment: Comment, index: number) => html`<div class="comment__detail">
                                                                     <div class="detail__user">
                                                                         <div class="cardPost__user">
-                                                                            <div class="user__image"></div>
+                                                                            <div class="user__image" @click=${this.goToUserProfile}></div>
                                                                             <div class="user__information">
                                                                                 <p class="information__name">${comment.getUsername()}</p>
                                                                                 <p class="information__date">${comment.getDate()}</p>
