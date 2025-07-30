@@ -18,6 +18,12 @@ export default class LCardPost extends LitElement{
 
     static override get styles(): CSSResult{
         return css`
+            :host{
+                width: fit-content;
+                height: -webkit-fill-available;
+                display: inline-block;
+            }
+
             p{
                 margin: 0;
             }
@@ -240,7 +246,7 @@ export default class LCardPost extends LitElement{
 
         const comments: Array<Comment> = [];
 
-        this.referencePost.referenceLearnGuitar.socket.on("comment", (result: Array<CommentObject>) => {
+        this.referencePost?.referenceLearnGuitar?.socket.on("comment", (result: Array<CommentObject>) => {
             result.map((comment: CommentObject) => {
                 comments.push(new Comment(comment));
             });
@@ -289,7 +295,6 @@ export default class LCardPost extends LitElement{
     }
 
     private likedPost(){
-        console.log(this._isLiked);
         if(this._isLiked){
             this._buttonLike.filled = true;
 
@@ -401,9 +406,14 @@ export default class LCardPost extends LitElement{
                                                                 </div>`);
     }
 
+    private goToUserProfile(){
+        sessionStorage.setItem("username", this.post.getUsername());
+        this.referencePost.referenceLearnGuitar.router.goto("/profile");
+    }
+
     private generatePostUser(username: string, date: string | undefined, text: string,): TemplateResult {
         return html`<div class="cardPost__user">
-                        <div class="user__image"></div>
+                        <div class="user__image" @click=${this.goToUserProfile}></div>
                         <div class="user__information">
                             <p class="information__name">${username}</p>
                             <p class="information__date">${date}</p>

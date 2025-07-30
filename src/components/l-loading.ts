@@ -6,7 +6,7 @@ export default class LLoading extends LitElement{
     static override get styles(): CSSResult{
         return css`
             .loading{
-                position: absolute;
+                position: fixed;
                 top: 0;
                 background-color: #fff;
                 width: 100vw;

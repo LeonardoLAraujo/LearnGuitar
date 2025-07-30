@@ -2,7 +2,7 @@ import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
 import { customElement, property, query, state } from 'lit/decorators.js';
 import "ecv-component";
 import { IconTypes } from 'ecv-component';
-import LearnGuitar from '../learn-guitar';
+import {LearnGuitar} from '../learn-guitar';
 
 @customElement('l-menu')
 export default class LMenu extends LitElement{
@@ -190,7 +190,10 @@ export default class LMenu extends LitElement{
     }
 
     private goToMyProfile(): void{
+        sessionStorage.setItem("username", this._user._username);
         this.referenceLearnGuitar.router.goto("/profile");
+
+        this.referenceLearnGuitar.requestUpdate();
     }
 
     private generateUserMenu(){

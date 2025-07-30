@@ -76,7 +76,7 @@ export default class LCardVideo extends LitElement{
         return html`
             <style>
                 .background__image{
-                    background-image: url(${this.video.getTumblr() == undefined ? "https://static.vecteezy.com/ti/fotos-gratis/p1/7073820-mesa-de-madeira-e-borrao-da-beleza-por-do-sol-ceu-e-montanhas-como-fundo-gratis-foto.jpg" : ""});
+                    background-image: url(${this.video?.getTumblr() == undefined ? "https://static.vecteezy.com/ti/fotos-gratis/p1/7073820-mesa-de-madeira-e-borrao-da-beleza-por-do-sol-ceu-e-montanhas-como-fundo-gratis-foto.jpg" : ""});
                 }
             </style>
             <div class="card">

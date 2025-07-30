@@ -93,6 +93,8 @@ export default class LCreateVideo extends LitElement{
           `;
        }
 
+       private _user = JSON.parse(localStorage.getItem("user") as string)?.user;
+
         @query(".createClassroom")
         containerCreate!: HTMLDivElement;
     
@@ -139,7 +141,7 @@ export default class LCreateVideo extends LitElement{
     
             const service: Service = new Service;
             
-            service.registerVideo(this.inputTitle.value, this.inputDescription.value, this.inputSourceVideoYoutube.value).then((result) => {
+            service.registerVideo(this._user._id, this.inputTitle.value, this.inputDescription.value, this.inputSourceVideoYoutube.value).then((result) => {
                 console.log(result);
             });
 

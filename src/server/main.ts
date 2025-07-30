@@ -5,7 +5,7 @@ import ViteExpress from "vite-express";
 import MySQL from "../base/mysql";
 import { MysqlError } from "mysql";
 import cors from "cors";
-import { ObjectUser } from "../model/user";
+import { UserObject } from "../model/user";
 import { PostObject } from "../type/post";
 import { CommentObject } from "../type/comment";
 
@@ -84,7 +84,7 @@ export class Setting {
 					let erroText: string = "";
 					let isErrorCreateAccount: boolean = false;
 
-					result.forEach((user: ObjectUser) => {
+					result.forEach((user: UserObject) => {
 						if(req.body.name == user.username){
 							erroText = "Username já em Uso!";
 							isErrorCreateAccount = true;
@@ -274,7 +274,6 @@ export class Setting {
 
 		this.app.post("/userLikePostCurrent", (req: any, resp: any) => {
 			try{
-
 				this.mysqlInstance.getConnection().query(`SELECT * FROM likePost l WHERE l.post_id = ${req.body.postId} AND l.user_id = ${req.body.userId}`, 
 					(error: MysqlError, result: any) => {
 						if(error != null){
@@ -391,11 +390,11 @@ export class Setting {
 
 		this.app.post("/registerVideo", (req: any, resp: any) => {
 			try{
-				const INSERT_VIDEO = "INSERT INTO video(title, description, sourcevideoyoutube, tumblr) VALUES(?, ?, ?, NULL)";
+				const INSERT_VIDEO = "INSERT INTO video(user_id, title, description, sourcevideoyoutube, tumblr) VALUES(?, ?, ?, ?, NULL)";
 
 				this.mysqlInstance.getConnection().query({
 					sql: INSERT_VIDEO,
-					values: [req.body.title, req.body.description, req.body.sourceVideoYoutube, req.body.tumblr]
+					values: [req.body.userId, req.body.title, req.body.description, req.body.sourceVideoYoutube, req.body.tumblr]
 				}, (error: MysqlError, result) => {
 					if(error != null){
 						throw error;
@@ -443,7 +442,8 @@ export class Setting {
 																					)
 																				)
 																				FROM post p
-																				JOIN USER u ON p.user_id = ${req.body.userId}
+																				JOIN USER u ON p.user_id = u.id 
+																				AND u.id = ${req.body.userId}
 																				ORDER BY p.date DESC
 																			),
 																			JSON_ARRAY()
@@ -460,6 +460,43 @@ export class Setting {
 				);
 			}catch(error){
 				console.log(`Error: ${error}`)
+			}
+		});
+
+		this.app.post("/myVideos", (req: any, resp: any) => {
+			try{
+				this.mysqlInstance.getConnection().query(`SELECT * FROM video WHERE user_id = ${req.body.userId}`, (error: MysqlError, result: any) => {
+					if(error != null){
+						throw error;
+					}
+
+					if(result){
+						return resp.json(result);
+					}
+				});
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
+
+		this.app.post("/userForUsername", (req: any, resp: any) => {
+			try{
+				const SELECT_USER = `SELECT * FROM user WHERE username = '${req.body.username}'`;
+
+				this.mysqlInstance.getConnection().query({
+					sql: SELECT_USER,
+					values: [req.body.userId]
+				}, (error: MysqlError, result: any) => {
+					if(error != null){
+						throw error;
+					}
+
+					if(result){
+						return resp.json(result[0]);
+					}
+				});
+			}catch(error){	
+				console.log(`Error: ${error}`);
 			}
 		});
 	}	

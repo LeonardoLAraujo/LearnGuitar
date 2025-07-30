@@ -1,4 +1,4 @@
-export type ObjectUser = {
+export type UserObject = {
     id: number,
     username: string,
     email: string,
@@ -12,7 +12,7 @@ export class User {
     private _email: string = "";
     private _photo: string | undefined = "";
 
-    constructor(user: ObjectUser){
+    constructor(user: UserObject){
         this._id = user.id;
         this._username = user.username;
         this._email = user.email;

@@ -1,5 +1,6 @@
 import { CommentObject } from "../type/comment";
 import { PostObject } from "../type/post";
+import { VideoObject } from "../type/video";
 
 export class Service {
 
@@ -209,13 +210,13 @@ export class Service {
         return result;
     }
 
-    public async registerVideo(title: string, description: string, sourceVideoYoutube: string, tumblr?: string){
+    public async registerVideo(userId: number, title: string, description: string, sourceVideoYoutube: string, tumblr?: string){
         const request = await fetch("/registerVideo", {
             method: "post",
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({title: title, description: description, sourceVideoYoutube: sourceVideoYoutube, tumblr: tumblr})
+            body: JSON.stringify({userId: userId, title: title, description: description, sourceVideoYoutube: sourceVideoYoutube, tumblr: tumblr})
         });
 
         const response = await request.json();
@@ -236,7 +237,7 @@ export class Service {
         return response;
     }
 
-    public async myPost(userId: number){
+    public async myPost(userId: number): Promise<Array<PostObject>>{
         const request = await fetch("/myPosts", {
             method: "post",
             headers: {
@@ -245,6 +246,34 @@ export class Service {
             body: JSON.stringify({userId: userId})
         });
 
+        const response = await request.json();
+
+        return response;
+    }
+
+    public async myVideo(userId: number): Promise<VideoObject[]>{
+        const request = await fetch("/myVideos", {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({userId: userId})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
+
+    public async userForUsername(username: string){
+        const request = await fetch("/userForUsername", {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({username: username})
+        });
+        
         const response = await request.json();
 
         return response;

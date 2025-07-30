@@ -1,6 +1,6 @@
 import { IconTypes } from 'ecv-component';
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, query, state } from 'lit/decorators.js';
+import { customElement, query } from 'lit/decorators.js';
 import "../components/l-card-video";
 import "../components/l-create-video";
 import LCreateVideo from '../components/l-create-video';
@@ -8,6 +8,8 @@ import { Service } from '../server/service';
 import { VideoObject } from '../type/video';
 import { Video } from '../model/video';
 import { LitPlayerYoutube } from 'lit-player-youtube';
+import { until } from 'lit/directives/until.js';
+import "../components/l-loading";
 
 @customElement('l-video')
 export default class LVideo extends LitElement{
@@ -179,7 +181,6 @@ export default class LVideo extends LitElement{
     private _body = document.querySelector("body");
     private _service: Service = new Service;
 
-    @state()
     private _listVideos: Array<Video> = [];
 
     @query(".modalVideo")
@@ -193,10 +194,6 @@ export default class LVideo extends LitElement{
 
     @query(".player__video")
     private _litPlayerYoutube!: LitPlayerYoutube;
-
-    protected override firstUpdated(): void {
-        this.getVideos();
-    }
 
     private closeModalVideo(): void{
         this._containerModalVideo.style.display = "none";
@@ -224,19 +221,16 @@ export default class LVideo extends LitElement{
         this._lCreateVideo.showModal();
     }
 
-    private getVideos(){
-        const listVideoObject: Array<Video> = [];
+    private async generateCardVideo(): Promise<Array<TemplateResult>>{
+        const listVideoObject: Array<VideoObject> = await this._service.allVideo();
+        const listVideo: Array<Video> = [];
 
-        this._service.allVideo().then((result: Array<VideoObject>) => {
-            result.map((video: VideoObject) => {
-                listVideoObject.push(new Video(video));
-            });
-
-            this._listVideos = listVideoObject;
+        listVideoObject.map((video: VideoObject) => {
+            listVideo.push(new Video(video));
         });
-    }
 
-    private generateCardVideo(): Array<TemplateResult>{
+        this._listVideos = listVideo;
+
         return this._listVideos.map((video: Video) => html`<l-card-video .video=${video} @click=${() => {this.openVideo(video.getSourceVideoYoutube())}}></l-card-video>`)
     }
 
@@ -264,7 +258,7 @@ export default class LVideo extends LitElement{
                     </div>
                 </div>
                 <div class="video__card">
-                    ${this.generateCardVideo()}
+                    ${until(this.generateCardVideo(), html`<l-loading></l-loading>`)}
                 </div>
             </div>
             <div class="modalVideo">

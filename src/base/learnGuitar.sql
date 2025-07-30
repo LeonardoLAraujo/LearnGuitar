@@ -65,8 +65,10 @@ INSERT INTO category(text) VALUES ("iniciante"), ("intermediário"), ("Avançado
 
 CREATE TABLE video (
 	id INT PRIMARY KEY AUTO_INCREMENT,
+	user_id INT,
 	title VARCHAR(100) NOT NULL,
 	description VARCHAR(255) NULL,
 	tumblr VARCHAR(255) NULL,
-	sourceVideoYoutube VARCHAR(255) NOT NULL
+	sourceVideoYoutube VARCHAR(255) NOT NULL,
+	CONSTRAINT fk_video_user FOREIGN KEY (user_id) REFERENCES user(id)
 );
