@@ -499,6 +499,64 @@ export class Setting {
 				console.log(`Error: ${error}`);
 			}
 		});
+
+		this.app.post("/addUser", (req: any, resp: any) => {
+			try{
+				const ADD_USER = `INSERT INTO friend(user_id, user_friend_id) VALUES (?, ?)`;
+
+				this.mysqlInstance.getConnection().query({
+					sql: ADD_USER,
+					values: [req.body.userId, req.body.friendId]
+				}, (error: MysqlError, result: any) => {
+					if(error){
+						throw error;
+					}
+
+					if(result){
+						return resp.json({sucess: true, message: "Adicionado com Sucesso!"})
+					}
+				});
+
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
+
+		this.app.post("/myfollowers", (req: any, resp: any) => {
+			try{
+				this.mysqlInstance.getConnection().query(`SELECT * FROM friend WHERE user_friend_id=${req.body.userId}`,
+					(error: MysqlError, result: any) => {
+						if(error){
+							throw error;
+						}
+
+						if(result){
+							return resp.json(result);
+						}
+					}
+				);
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
+
+		this.app.post("/myfollowing", (req: any, resp: any) => {
+			try{
+				this.mysqlInstance.getConnection().query(`SELECT * FROM friend WHERE user_id=${req.body.userId}`,
+					(error: MysqlError, result: any) => {
+						if(error){
+							throw error;
+						}
+
+						if(result){
+							return resp.json(result);
+						}
+					}
+				);
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
 	}	
 
 	listenSocket(): void{

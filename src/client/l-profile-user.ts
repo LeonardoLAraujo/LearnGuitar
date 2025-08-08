@@ -101,6 +101,32 @@ export default class LProfileUser extends LitElement{
                 border-radius: 0px;
             }
 
+            .user__information button{
+                margin-top: 1rem;
+                cursor: pointer;
+                font-size: 18px;
+                font-family: PoppinsLight;
+                width: 120px;
+                border: none;
+                color: #fff;
+            }
+
+            .information__edit{
+                background-color: var(--orange);
+            }
+
+            .information__edit:hover{
+                background-color: var(--dark-orange);
+            }
+
+            .information__add{
+                background-color: var(--dark-green);
+            }
+
+            .information__add:hover{
+                background-color: var(--light-green);
+            }
+
             @media (min-width: 764px){
                 .profile__user img{
                     width: 40%;
@@ -134,10 +160,37 @@ export default class LProfileUser extends LitElement{
     @state()
     userCurrent!: User;
 
+    private _myFollowers: Array<any> = []; 
+
+    private _myFollowing: Array<any> = []; 
+
     protected override firstUpdated(): void {
         this._service.userForUsername(this._username as string).then((result: UserObject) => {
            this.userCurrent = new User(result);
         });
+    }
+
+    private infoUserFollow(){
+        if(this._user._username == this.userCurrent?.getUsername()){
+            this._service.getMyFollowers(this._user._id).then((followers) => {
+                this._myFollowers = followers;
+            });
+
+            this._service.getMyFollowing(this._user._id).then((following) => {
+                this._myFollowing = following;
+            });
+        }else{
+            console.log("diferente");
+
+            this._service.getMyFollowers(this._user._id).then((followers) => {
+                this._myFollowers = followers;
+            });
+
+            this._service.getMyFollowing(this._user._id).then((following) => {
+                this._myFollowing = following;
+            });
+        }
+    
     }
 
 
@@ -184,14 +237,28 @@ export default class LProfileUser extends LitElement{
         return this._listVideo.map((video: Video) => html`<l-card-video .video=${video}></l-card-video>`);
     }
 
+    private addUser(): void{
+        this._service.addUser(this._user._id, this.userCurrent?.getId()).then((result) => {
+            console.log(result);
+        });
+    }
+
     protected override render(): TemplateResult{
-         
+        if(this.userCurrent != undefined){
+            this.infoUserFollow();
+        }
+
         return html`
             <div class="profile">
                 <div class="profile__user">
                     <img src=${ifDefined(this._user._photo == null ? "https://upload.wikimedia.org/wikipedia/commons/0/03/Sem_imagem.jpg" : this.userCurrent?.getPhotoUser())}>
                     <div class="user__information">
                         ${this.generateInformationUser("Nome", this.userCurrent?.getUsername())}
+                        ${this.generateInformationUser("Seguido", `${this._myFollowing?.length}`)}
+                        ${this.generateInformationUser("Seguidores", `${this._myFollowers?.length}`)}
+                        ${this._user._id == this.userCurrent?.getId() ? 
+                            html`<button class="information__edit">Editar</button>` 
+                            : html`<button class="information__add" @click=${this.addUser}>Adiconar</button>`}
                     </div>
                 </div>
                 <div class="profile__posts">

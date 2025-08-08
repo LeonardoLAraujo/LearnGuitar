@@ -72,3 +72,11 @@ CREATE TABLE video (
 	sourceVideoYoutube VARCHAR(255) NOT NULL,
 	CONSTRAINT fk_video_user FOREIGN KEY (user_id) REFERENCES user(id)
 );
+
+CREATE TABLE friend (
+	id INT PRIMARY KEY AUTO_INCREMENT,
+	user_id INT,
+	user_friend_id INT,
+	CONSTRAINT fk_friend_user FOREIGN KEY (user_id) REFERENCES user(id),
+	CONSTRAINT fk_friend_user_friend FOREIGN KEY (user_friend_id) REFERENCES user(id)
+);

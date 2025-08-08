@@ -278,4 +278,46 @@ export class Service {
 
         return response;
     }
+
+    public async addUser(userId: number, addUserId: number){
+        const request = await fetch("/addUser", {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({userId: userId, friendId: addUserId})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
+
+    public async getMyFollowers(userId: number){
+        const request = await fetch("/myfollowers", {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({userId: userId})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
+
+    public async getMyFollowing(userId: number){
+        const request = await fetch("/myfollowing", {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({userId: userId})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
 }
