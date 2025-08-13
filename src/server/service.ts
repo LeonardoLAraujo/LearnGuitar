@@ -320,4 +320,18 @@ export class Service {
 
         return response;
     }
+
+    public async unFollow(userId: number){
+        const request = await fetch("/unfollow", {
+            method: "post",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({userId: userId})
+        });
+
+        const response = await request.json();
+
+        return response;
+    }
 }

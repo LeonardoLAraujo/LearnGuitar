@@ -1,5 +1,5 @@
 import {LitElement, html, css, TemplateResult, CSSResult} from 'lit';
-import { customElement, state } from 'lit/decorators.js';
+import { customElement, property, state } from 'lit/decorators.js';
 import { PostObject } from '../type/post';
 import { Service } from '../server/service';
 import { Post } from '../model/post';
@@ -11,6 +11,8 @@ import "../components/l-card-video";
 import "../components/l-card-post";
 import { User, UserObject } from '../model/user';
 import { ifDefined } from 'lit/directives/if-defined.js';
+import "../components/l-modal-my-follow";
+import { LearnGuitar } from '../learn-guitar';
 
 @customElement('l-profile-user')
 export default class LProfileUser extends LitElement{
@@ -127,6 +129,14 @@ export default class LProfileUser extends LitElement{
                 background-color: var(--light-green);
             }
 
+            .information__follow{
+                background-color: var(--light-gray);
+            }
+
+            .information__follow:hover{
+                background-color: var(--light-gray-opacity);
+            }
+
             @media (min-width: 764px){
                 .profile__user img{
                     width: 40%;
@@ -160,39 +170,61 @@ export default class LProfileUser extends LitElement{
     @state()
     userCurrent!: User;
 
+    @state()
+    private _isMyFollowers: boolean = false;
+
+    @state()
     private _myFollowers: Array<any> = []; 
 
+    @state()
     private _myFollowing: Array<any> = []; 
 
-    protected override firstUpdated(): void {
-        this._service.userForUsername(this._username as string).then((result: UserObject) => {
-           this.userCurrent = new User(result);
+    @state()
+    private _countMyFollowing: number = 0;
+
+    @property({attribute: false})
+    referenceLearnGuitar!: LearnGuitar;
+
+    override connectedCallback(): void {
+        super.connectedCallback();
+
+        this.referenceLearnGuitar.socket.on("following", async (result: any) => {
+            this._myFollowing = result;
+
+            console.log(this._myFollowing);
+
+            this.requestUpdate();
         });
     }
 
-    private infoUserFollow(){
-        if(this._user._username == this.userCurrent?.getUsername()){
-            this._service.getMyFollowers(this._user._id).then((followers) => {
-                this._myFollowers = followers;
-            });
+    protected override async firstUpdated(): Promise<void> {
+        this._service.userForUsername(this._username as string).then((result: UserObject) => {
+           this.userCurrent = new User(result);
+        });
 
-            this._service.getMyFollowing(this._user._id).then((following) => {
-                this._myFollowing = following;
-            });
-        }else{
-            console.log("diferente");
+        this._myFollowers = await this.getMyFollowers();
+        this._myFollowing = await this.getFollowing();
 
-            this._service.getMyFollowers(this._user._id).then((followers) => {
-                this._myFollowers = followers;
-            });
+        this._countMyFollowing = this._myFollowing.length;
 
-            this._service.getMyFollowing(this._user._id).then((following) => {
-                this._myFollowing = following;
-            });
-        }
-    
+        this._myFollowing.map((following: any) => {
+            if(following.user_friend_id == this.userCurrent.getId()){
+                this._isMyFollowers = true;
+            }
+        });
     }
 
+    private async getMyFollowers(): Promise<Array<any>>{
+        const myFollow = await this._service.getMyFollowers(this._user._id);
+
+        return myFollow;
+    }
+
+    private async getFollowing(): Promise<Array<any>>{
+        const myFollowing = await this._service.getMyFollowing(this._user._id);
+
+        return myFollowing;
+    }
 
     private generateInformationUser(label: string, value: string){
         return html`
@@ -238,26 +270,52 @@ export default class LProfileUser extends LitElement{
     }
 
     private addUser(): void{
-        this._service.addUser(this._user._id, this.userCurrent?.getId()).then((result) => {
-            console.log(result);
+        this._service.addUser(this._user._id, this.userCurrent?.getId());
+
+        this._service.getMyFollowing(this._user._id).then((result) => {
+            result.map((following: any) => {
+                if(following.user_friend_id == this.userCurrent.getId()){
+                    this._isMyFollowers = true;
+                }
+            });
+
+            this._countMyFollowing = result.length;
+            
+            this.referenceLearnGuitar.socket.emit("following", result);
         });
     }
 
-    protected override render(): TemplateResult{
-        if(this.userCurrent != undefined){
-            this.infoUserFollow();
-        }
+    private async unfollow(){
+        this._service.unFollow(this._user._id).then((_result) => {
 
+            this._isMyFollowers = false;
+
+            this._service.getMyFollowing(this._user._id).then((result) => {
+                this._countMyFollowing = result.length;
+                this.referenceLearnGuitar.socket.emit("following", result);
+            });
+
+        });
+
+        
+
+        
+    }   
+
+    protected override render(): TemplateResult{
         return html`
+           
             <div class="profile">
+                <!-- <l-modal-my-follow></l-modal-my-follow> -->
                 <div class="profile__user">
                     <img src=${ifDefined(this._user._photo == null ? "https://upload.wikimedia.org/wikipedia/commons/0/03/Sem_imagem.jpg" : this.userCurrent?.getPhotoUser())}>
                     <div class="user__information">
                         ${this.generateInformationUser("Nome", this.userCurrent?.getUsername())}
-                        ${this.generateInformationUser("Seguido", `${this._myFollowing?.length}`)}
+                        ${this.generateInformationUser("Seguindo", `${this._countMyFollowing}`)}
                         ${this.generateInformationUser("Seguidores", `${this._myFollowers?.length}`)}
                         ${this._user._id == this.userCurrent?.getId() ? 
                             html`<button class="information__edit">Editar</button>` 
+                            : this._isMyFollowers == true ? html`<button class="information__follow" @click=${this.unfollow}>Seguindo</button>` 
                             : html`<button class="information__add" @click=${this.addUser}>Adiconar</button>`}
                     </div>
                 </div>
@@ -274,6 +332,7 @@ export default class LProfileUser extends LitElement{
                     </div>
                 </div>
             </div>
+             
         `;
     }
 

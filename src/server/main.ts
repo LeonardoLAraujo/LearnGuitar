@@ -557,6 +557,22 @@ export class Setting {
 				console.log(`Error: ${error}`);
 			}
 		});
+
+		this.app.post("/unfollow", (req: any, resp: any) => {
+			try{
+				this.mysqlInstance.getConnection().query(`DELETE FROM friend WHERE user_id = ${req.body.userId}`, (error: MysqlError, result: any) => {
+					if(error != null){
+						throw error;
+					}
+
+					if(result){
+						return resp.json({sucess: true, message: "Parou de seguir"});
+					}
+				});
+			}catch(error){
+				console.log(`Error: ${error}`);
+			}
+		});
 	}	
 
 	listenSocket(): void{
@@ -577,6 +593,10 @@ export class Setting {
 			
 			socket.on("comment", (request: Array<CommentObject>) => {
 				this.io.emit("comment", request);
+			});
+
+			socket.on("following", (request: any) => {
+				this.io.emit("follow", request);
 			});
 		});
 	}

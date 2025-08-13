@@ -38,7 +38,7 @@ export class LearnGuitar extends LitElement implements ISocket{
         {path: '/postagens',    render: () => html`<l-post .referenceLearnGuitar=${this}></l-post>`},
         {path: '/videos',       render: () => html`<l-video></l-video>`},
         {path: '/entrar',       render: () => html`<l-login .referenceLearnGuitar=${this}></l-login>`},
-        {path: '/profile',      render: () => html`<l-profile-user></l-profile-user>`}
+        {path: '/profile',      render: () => html`<l-profile-user .referenceLearnGuitar=${this}></l-profile-user>`}
     ]);
 
     override connectedCallback(): void {
