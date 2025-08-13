@@ -272,17 +272,21 @@ export default class LProfileUser extends LitElement{
     private addUser(): void{
         this._service.addUser(this._user._id, this.userCurrent?.getId());
 
-        this._service.getMyFollowing(this._user._id).then((result) => {
-            result.map((following: any) => {
-                if(following.user_friend_id == this.userCurrent.getId()){
-                    this._isMyFollowers = true;
-                }
-            });
+        try{
+            this._service.getMyFollowing(this._user._id).then((result) => {
+                result.map((following: any) => {
+                    if(following.user_friend_id == this.userCurrent.getId()){
+                        this._isMyFollowers = true;
+                    }
+                });
 
-            this._countMyFollowing = result.length;
-            
-            this.referenceLearnGuitar.socket.emit("following", result);
-        });
+                this._countMyFollowing = result.length;
+                
+                this.referenceLearnGuitar.socket.emit("following", result);
+            });
+        }catch(error){
+            console.log(error);
+        }
     }
 
     private async unfollow(){
@@ -295,11 +299,7 @@ export default class LProfileUser extends LitElement{
                 this.referenceLearnGuitar.socket.emit("following", result);
             });
 
-        });
-
-        
-
-        
+        });    
     }   
 
     protected override render(): TemplateResult{
